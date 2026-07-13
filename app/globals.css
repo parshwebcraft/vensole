@@ -1,0 +1,379 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Vensoul Theme - Warm, elegant, storytelling-inspired */
+    --background: 40 33% 99%;
+    --foreground: 20 14% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 10%;
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 25% 95%;
+    --secondary-foreground: 20 14% 20%;
+    --muted: 30 20% 96%;
+    --muted-foreground: 20 10% 40%;
+    --accent: 24 70% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 15% 88%;
+    --input: 30 15% 88%;
+    --ring: 24 95% 53%;
+    --radius: 0.5rem;
+
+    /* Chart colors for analytics */
+    --chart-1: 24 95% 53%;
+    --chart-2: 197 37% 40%;
+    --chart-3: 173 58% 45%;
+    --chart-4: 43 74% 60%;
+    --chart-5: 280 55% 55%;
+
+    /* Vensoul brand accent - Cozy Literary Sunset */
+    --vensoul-gradient: linear-gradient(135deg, #9f1239 0%, #ea580c 60%, #eab308 100%);
+  }
+
+  .dark {
+    /* Dark Theme - Deep, rich, dramatic */
+    --background: 20 14% 8%;
+    --foreground: 30 20% 95%;
+    --card: 20 14% 11%;
+    --card-foreground: 30 20% 95%;
+    --popover: 20 14% 12%;
+    --popover-foreground: 30 20% 95%;
+    --primary: 24 95% 55%;
+    --primary-foreground: 20 14% 10%;
+    --secondary: 20 10% 18%;
+    --secondary-foreground: 30 20% 90%;
+    --muted: 20 10% 15%;
+    --muted-foreground: 30 10% 55%;
+    --accent: 24 70% 50%;
+    --accent-foreground: 20 14% 8%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 30 20% 98%;
+    --border: 20 10% 20%;
+    --input: 20 10% 20%;
+    --ring: 24 95% 55%;
+
+    /* Vensoul brand accent - Glowing Warmth */
+    --vensoul-gradient: linear-gradient(135deg, #f43f5e 0%, #fb923c 60%, #fbbf24 100%);
+
+    /* Chart colors for dark mode */
+    --chart-1: 24 95% 55%;
+    --chart-2: 197 37% 50%;
+    --chart-3: 173 58% 50%;
+    --chart-4: 43 74% 65%;
+    --chart-5: 280 55% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Paper grain overlay for vintage premium feel */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 99999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* Hide default cursor on desktop for custom cursor overlay */
+  @media (min-width: 768px) and (pointer: fine) {
+    body, a, button, [role="button"], input, select, textarea {
+      cursor: none !important;
+    }
+  }
+
+  /* Focus visible outline (WCAG AA) */
+  *:focus-visible {
+    outline: 3px solid hsl(var(--primary));
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px hsl(var(--background)), 0 0 0 7px hsl(var(--primary) / 0.4);
+    transition: box-shadow 0.15s ease-out, outline-color 0.15s ease-out;
+  }
+
+  /* Smooth scrolling with support for reduced motion */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Responsive Typography and Layout Sizing */
+  h1 {
+    font-size: clamp(2rem, 5vw + 0.5rem, 4rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 3.5vw + 0.5rem, 2.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2vw + 0.5rem, 1.75rem);
+    line-height: 1.3;
+  }
+
+  p {
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.25);
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--background));
+    transition: background-color 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.45);
+  }
+}
+
+
+@layer components {
+  /* Vensoul brand gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--vensoul-gradient);
+  }
+
+  /* Reading mode styles */
+  .prose-reading {
+    @apply text-lg leading-relaxed;
+    max-width: 75ch;
+  }
+
+  .prose-reading p {
+    @apply mb-6;
+  }
+
+  .prose-reading h1, .prose-reading h2, .prose-reading h3 {
+    @apply font-bold mb-4 mt-8 text-foreground;
+  }
+
+  .prose-reading h1 {
+    @apply text-3xl;
+  }
+
+  .prose-reading h2 {
+    @apply text-2xl;
+  }
+
+  .prose-reading h3 {
+    @apply text-xl;
+  }
+
+  .prose-reading blockquote {
+    @apply border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-6;
+  }
+
+  .prose-reading ul, .prose-reading ol {
+    @apply my-4 pl-6;
+  }
+
+  .prose-reading li {
+    @apply mb-2;
+  }
+
+  .prose-reading ul li {
+    @apply list-disc;
+  }
+
+  .prose-reading ol li {
+    @apply list-decimal;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  /* Story cover aspect ratio */
+  .story-cover {
+    aspect-ratio: 2 / 3;
+  }
+}
+
+@layer utilities {
+  /* Animation utilities */
+  .animate-fade-up {
+    animation: fadeUp 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Genre Hover Animations */
+
+/* Fantasy - Sparkling Stars */
+.genre-sparkles span {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.group:hover .genre-sparkles span {
+  opacity: 0.8;
+}
+.group:hover .genre-sparkles span:nth-child(1) {
+  top: 10%; left: 20%; width: 4px; height: 4px; animation: twinkle 1s infinite alternate;
+}
+.group:hover .genre-sparkles span:nth-child(2) {
+  top: 30%; right: 15%; width: 6px; height: 6px; animation: twinkle 1.4s infinite alternate 0.2s;
+}
+.group:hover .genre-sparkles span:nth-child(3) {
+  bottom: 20%; left: 30%; width: 5px; height: 5px; animation: twinkle 1.2s infinite alternate 0.4s;
+}
+@keyframes twinkle {
+  0% { transform: scale(0.3); opacity: 0.2; }
+  100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 8px #f59e0b; }
+}
+
+/* Action - Flame Flicker */
+.genre-flame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at bottom, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.group:hover .genre-flame {
+  opacity: 1;
+  animation: flicker 0.15s infinite alternate;
+}
+@keyframes flicker {
+  0% { transform: scale(0.97) skewX(-1deg); opacity: 0.8; }
+  100% { transform: scale(1.03) skewX(1deg); opacity: 1; }
+}
+
+/* Romance - Floating Petals */
+.genre-petals span {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(20px) rotate(0deg);
+  transition: opacity 0.3s ease;
+}
+.group:hover .genre-petals span {
+  opacity: 0.7;
+}
+.group:hover .genre-petals span:nth-child(1) {
+  left: 20%; width: 6px; height: 6px; background: #ec4899; border-radius: 50% 0 50% 50%; animation: floatPetal 2s infinite linear;
+}
+.group:hover .genre-petals span:nth-child(2) {
+  right: 25%; width: 8px; height: 8px; background: #f472b6; border-radius: 50% 0 50% 50%; animation: floatPetal 2.5s infinite linear 0.5s;
+}
+@keyframes floatPetal {
+  0% { transform: translateY(30px) rotate(0deg); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-40px) rotate(360deg); opacity: 0; }
+}
+
+/* Mystery - Rolling Fog */
+.genre-fog {
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 200%;
+  height: 40%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
+  filter: blur(4px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.group:hover .genre-fog {
+  opacity: 1;
+  animation: moveFog 4s infinite linear;
+}
+@keyframes moveFog {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+
+/* Horror - Dark Smoke Vignette */
+.genre-smoke {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.group:hover .genre-smoke {
+  opacity: 1;
+  animation: pulseSmoke 2s infinite ease-in-out alternate;
+}
+@keyframes pulseSmoke {
+  0% { box-shadow: inset 0 0 10px rgba(0,0,0,0.6); }
+  100% { box-shadow: inset 0 0 25px rgba(0,0,0,0.95); }
+}

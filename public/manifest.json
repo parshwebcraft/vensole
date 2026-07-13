@@ -1,0 +1,42 @@
+{
+  "name": "Vensoul",
+  "short_name": "Vensoul",
+  "description": "Where Stories Find Their Soul - A cozy digital library and storytelling sanctuary.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0a09",
+  "theme_color": "#ea580c",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["books", "entertainment"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Stories",
+      "short_name": "Browse",
+      "description": "Explore the Vensoul library",
+      "url": "/stories",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Start Writing",
+      "short_name": "Write",
+      "description": "Write your own story",
+      "url": "/write",
+      "icons": [{ "src": "/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
