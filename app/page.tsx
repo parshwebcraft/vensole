@@ -20,8 +20,8 @@ import { FeaturedStories } from '@/components/featured-stories'
 import { GenreSection } from '@/components/genre-section'
 import { createClient } from '@/lib/supabase/server'
 import { HeroInteractive } from '@/components/hero-interactive'
-import { LibraryEntrance } from '@/components/library-entrance'
 import { FooterNewsletter } from '@/components/footer-newsletter'
+
 
 
 
@@ -79,8 +79,8 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-background max-w-full overflow-x-hidden">
-      <LibraryEntrance />
       <SiteHeader />
+
 
       <HeroInteractive
         storiesCount={storiesCount}
