@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Moved On. My Heart Didn't.</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cream: #faf7f2;
+  --warm: #f5efe6;
+  --petal: #f0e6d8;
+  --blush: #e8c4b0;
+  --rose: #c9826b;
+  --dusty: #a0736a;
+  --ink: #2c2118;
+  --ink2: #4a3728;
+  --muted: #8a7060;
+  --line: rgba(44,33,24,0.1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  overflow-x: hidden;
+}
+
+/* ── PROGRESS ── */
+#bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--blush), var(--rose));
+  z-index: 999;
+  transition: width 0.2s;
+}
+
+/* ── SIDE NAV ── */
+#sidenav {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--blush);
+  opacity: 0.35;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+.dot:hover, .dot.on {
+  opacity: 1;
+  background: var(--rose);
+  transform: scale(1.4);
+}
+.dot::before {
+  content: attr(data-tip);
+  position: absolute;
+  right: 16px; top: 50%;
+  transform: translateY(-50%);
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  letter-spacing: 0.03em;
+}
+.dot:hover::before { opacity: 1; }
+
+/* ── COVER ── */
+#cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 40px;
+  background: var(--warm);
+  position: relative;
+  overflow: hidden;
+}
+
+#cover::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,196,176,0.4) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cover-tag {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: up 1s ease 0.2s forwards;
+}
+
+.cover-h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(42px, 8vw, 96px);
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: up 1s ease 0.5s forwards;
+}
+
+.cover-h1 em {
+  font-style: italic;
+  color: var(--rose);
+}
+
+.cover-sub {
+  font-family: 'Lora', serif;
+  font-size: clamp(16px, 2vw, 20px);
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 32px;
+  max-width: 420px;
+  line-height: 1.7;
+  opacity: 0;
+  animation: up 1s ease 0.8s forwards;
+}
+
+.cover-divider {
+  width: 40px; height: 1px;
+  background: var(--blush);
+  margin: 40px auto 0;
+  opacity: 0;
+  animation: up 1s ease 1s forwards;
+}
+
+.cover-author {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 24px;
+  opacity: 0;
+  animation: up 1s ease 1.15s forwards;
+}
+
+.scroll-cue {
+  position: absolute;
+  bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: up 1s ease 1.3s forwards;
+}
+.scroll-cue span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, var(--rose), transparent);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+/* ── CHAPTERS ── */
+.chapter {
+  padding: 120px 24px;
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.chapter + .chapter {
+  border-top: 1px solid var(--line);
+}
+
+/* chapter header */
+.ch-tag {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.ch-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(52px, 10vw, 88px);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--blush);
+  user-select: none;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.ch-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 64px;
+}
+.ch-title em { color: var(--rose); font-style: italic; }
+
+/* epigraph */
+.epigraph {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  padding-left: 20px;
+  border-left: 2px solid var(--blush);
+  margin-bottom: 56px;
+  line-height: 1.8;
+}
+
+/* body text */
+.prose {
+  font-family: 'Lora', serif;
+  font-size: clamp(16.5px, 2vw, 18.5px);
+  line-height: 1.95;
+  color: var(--ink2);
+}
+.prose p { margin-bottom: 1.6em; }
+
+/* dramatic short lines */
+.prose .beat {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(22px, 3vw, 30px);
+  color: var(--ink);
+  text-align: center;
+  margin: 2.5em 0;
+  line-height: 1.3;
+}
+.prose .beat.rose { color: var(--rose); }
+.prose .beat.muted { color: var(--muted); font-size: clamp(14px, 1.6vw, 16px); font-family: 'DM Sans', sans-serif; font-style: normal; letter-spacing: 0.12em; }
+
+/* section break */
+.br {
+  display: flex; align-items: center; gap: 16px;
+  margin: 3em 0;
+}
+.br::before,.br::after { content:''; flex:1; height:1px; background: var(--line); }
+.br-dot { width:4px;height:4px;border-radius:50%;background:var(--blush);flex-shrink:0; }
+
+/* letter style */
+.letter {
+  background: var(--petal);
+  border-radius: 2px;
+  padding: 36px 40px;
+  margin: 2.5em 0;
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: clamp(15px, 1.8vw, 17px);
+  color: var(--ink2);
+  line-height: 1.9;
+  position: relative;
+}
+.letter::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -10px; left: 28px;
+  background: var(--petal);
+  padding: 0 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-style: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+.letter p { margin-bottom: 1em; }
+.letter p:last-child { margin-bottom: 0; }
+
+/* chapter end */
+.ch-end {
+  margin-top: 72px;
+  padding: 40px 0 0;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.ch-end p {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 20px);
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 0.5em;
+}
+.ch-end p + p { color: var(--rose); }
+
+/* pull quote */
+.pull {
+  text-align: center;
+  padding: 60px 0;
+  margin: 1em 0;
+}
+.pull p {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(20px, 2.5vw, 26px);
+  color: var(--ink);
+  line-height: 1.5;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.pull p::before { content: '\201C'; color: var(--blush); margin-right: 4px; }
+.pull p::after  { content: '\201D'; color: var(--blush); margin-left: 4px; }
+
+/* heart */
+.heart {
+  text-align: center;
+  color: var(--blush);
+  font-size: 18px;
+  margin: 2.5em 0;
+  animation: hbeat 2.5s ease-in-out infinite;
+}
+@keyframes hbeat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+
+/* ── AUTHOR NOTE ── */
+#note {
+  background: var(--warm);
+  padding: 120px 24px;
+}
+#note-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+#note-inner h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 56px;
+}
+#note-inner p {
+  font-family: 'Lora', serif;
+  font-size: clamp(16px, 2vw, 18px);
+  color: var(--ink2);
+  line-height: 2;
+  margin-bottom: 1.8em;
+}
+#note-inner strong { color: var(--ink); font-weight: 600; }
+.final-quote {
+  margin-top: 72px;
+  padding: 40px;
+  text-align: center;
+  border: 1px solid var(--blush);
+  border-radius: 2px;
+}
+.final-quote p {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(17px, 2vw, 22px);
+  color: var(--rose);
+  line-height: 1.6;
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.in { opacity: 1; transform: none; }
+
+/* ── ANIMATIONS ── */
+@keyframes up {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ── READING COUNTER ── */
+#pct {
+  position: fixed;
+  bottom: 28px; left: 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  z-index: 100;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 640px) {
+  #sidenav, #pct { display: none; }
+  .chapter { padding: 80px 20px; }
+  .letter { padding: 28px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div id="bar"></div>
+<div id="pct">0%</div>
+
+<nav id="sidenav"></nav>
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<section id="cover">
+<h1 class="cover-h1">I Moved On.<br><em>My Heart Didn't.</em></h1>
+  <p class="cover-sub">A story about love that survives. Hearts that don't. And the terrifying distance between the two.</p>
+  <div class="cover-divider"></div>
+  <p class="cover-author">by Rhythm</p>
+  <div class="scroll-cue">
+    <span>Begin reading</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 1 ═══════════════ -->
+<section class="chapter" id="ch1">
+  <div class="reveal">
+    <p class="ch-tag">Chapter One</p>
+    <span class="ch-num">01</span>
+    <h2 class="ch-title">The Day I <em>Stopped Waiting</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">People think heartbreak happens in a single moment.</p>
+    <p class="beat muted reveal">It doesn't.</p>
+
+    <p class="reveal">It breaks slowly and quietly, in pieces — a little when they stop calling, a little when their name disappears from your notifications, a little when you realize you're the only one still holding on.</p>
+
+    <p class="reveal">And then one day, you wake up and discover that the person you loved has become someone you remember.</p>
+
+    <p class="beat reveal">That's when the real heartbreak begins.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">The last message from him sat untouched in my phone, three words long.</p>
+
+    <p class="beat rose reveal">Take care, Rhythm.</p>
+
+    <p class="reveal">No explanation, no dramatic goodbye, no promises, no anger — just three simple words that somehow felt heavier than every conversation we'd ever had.</p>
+
+    <p class="reveal"><em>Take care.</em> As if he wasn't the person who taught me what feeling alive was. As if he wasn't the reason every song suddenly had meaning. As if he wasn't the first person I wanted to tell whenever something good happened. And the first person I wanted when things went wrong.</p>
+
+    <p class="reveal">I stared at those words for weeks, waiting for another message, another explanation, another chance.</p>
+
+    <p class="beat muted reveal">Nothing came.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">The strange thing about losing someone is that the world doesn't stop with you. The trains still arrive on time. Coffee shops still open every morning. Friends still laugh at jokes. The city still glows at night.</p>
+
+    <p class="beat reveal">Everything continues. Except you.</p>
+
+    <p class="reveal">You stay trapped somewhere between what happened and what could have been. Watching everyone move forward while you're still standing in the ruins.</p>
+
+    <p class="reveal">For months, I carried Aarav everywhere — not physically, since memories don't need suitcases, they travel light. He was in the corner table of a café, the smell of old books, the first rain of July, a song playing from a passing car. Everywhere and nowhere at the same time.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Then one day, something changed — not dramatically, no life-changing realization or grand speech. I simply got tired: tired of waiting, tired of hoping, tired of reopening wounds that had never been allowed to heal.</p>
+
+    <p class="reveal">So I did what everyone told me to do. I moved on. I deleted old photos, stopped rereading conversations, stopped checking whether he had viewed my stories, stopped searching for signs that he missed me too.</p>
+
+    <p class="reveal">I built a new routine. A new life. A new version of myself. And slowly... it worked. The days became easier. The nights became quieter. The memories became softer.</p>
+
+    <p class="beat reveal">Not happy. But okay.</p>
+    <p class="beat muted reveal">And sometimes, okay is enough.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Two years later, I was standing in a bookstore on a rainy Thursday evening. Just another ordinary version of me. The version that had survived. The version that had moved on.</p>
+
+    <p class="reveal">I was reaching for a novel when another hand touched the same book, and my fingers froze as time slowed and the world blurred.</p>
+
+    <p class="reveal">And suddenly, after two years of silence...</p>
+
+    <p class="beat rose reveal">There he was. Aarav.</p>
+
+    <p class="reveal">Older, different, familiar — the kind of familiar that hurts. For a second, neither of us spoke, because some people aren't memories. They're earthquakes. Even after years, they can still shake everything inside you.</p>
+
+    <p class="reveal">"Hi," he finally said. Just one word. Simple. Normal. Harmless. Yet somehow my heartbeat forgot how to behave. "Hi." That was all I managed. Years of unanswered questions. Years of missing someone. Years of imagining this exact moment. And all we had were two awkward greetings.</p>
+
+    <p class="beat muted reveal">Funny how life works.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">He smiled politely. The same smile that once felt like home. "You look happy," he said. I almost laughed. People always say that. As if happiness can be measured by someone's face. As if they can see the ghosts living behind your eyes. "I am," I replied. And for the first time, it wasn't entirely a lie.</p>
+
+    <p class="reveal">We talked for ten minutes, maybe fifteen, about work and life and the weather — everything except the thing that mattered. Us. Because sometimes the biggest conversations hide behind the smallest ones.</p>
+
+    <p class="reveal">Eventually he glanced at his watch. "I should go." Of course he should. People always leave. That's what they do. He smiled one last time.</p>
+
+    <p class="beat rose reveal">"Take care, Rhythm."</p>
+
+    <p class="reveal">The same words. The same goodbye. The same ache. And just like that, he was gone. Again.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">I stood there long after Aarav left. Rain tapping softly against the glass. People moving around me. Life continuing. Just like it always had. And that's when I realized something terrifying.</p>
+
+    <p class="reveal">I had moved on. My life had moved on. My habits had moved on. My routine had moved on. Even my pain had moved on. But somewhere deep inside me — a place time had never reached —</p>
+
+    <p class="beat rose reveal">my heart still hadn't.</p>
+
+    <p class="reveal">And for the first time in two years, it whispered his name again.</p>
+    <p class="beat reveal" style="letter-spacing:0.2em; font-size: clamp(28px,3.5vw,40px);">Aarav.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>I had buried the memories, silenced the questions, and outgrown the pain.</p>
+    <p>But some loves don't die. They simply learn how to haunt you quietly.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 2 ═══════════════ -->
+<section class="chapter" id="ch2">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Two</p>
+    <span class="ch-num">02</span>
+    <h2 class="ch-title">The Things I Never <em>Published</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">For a long time, I thought healing looked like progress.</p>
+
+    <p class="reveal">New cafés, new routines, new stories — a life that no longer had Aarav's fingerprints all over it. So that's exactly what I built. A life without him, at least from the outside.</p>
+
+    <p class="reveal">I changed apartments, started writing under a new pen name, cut my hair shorter, filled my shelves with books I never had time to read, started drinking black coffee even though I hated the taste. Little things — tiny rebellions against a past that refused to leave me alone.</p>
+
+    <p class="reveal">People noticed. "You seem different." "You seem happier." "You seem stronger." Maybe I was. Or maybe I had simply become better at hiding the cracks.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">The truth lived inside a folder on my laptop that nobody knew existed — not my readers, not my friends, not even the version of me that smiled during interviews and book signings.</p>
+
+    <p class="beat reveal">The folder was called: <em>Unpublished.</em></p>
+
+    <p class="reveal">Inside were hundreds of pages — stories, letters, fragments — every single one written for him, and every single one unfinished.</p>
+
+    <div class="letter data-label='October 12'" reveal>
+      <p><em>October 12.</em></p>
+      <p>"Today my second novel got accepted. You would've been the first person I called. Success feels strange when the person you wanted to celebrate with isn't here."</p>
+    </div>
+
+    <div class="letter reveal" data-label="December 24">
+      <p><em>December 24.</em></p>
+      <p>"The city looks beautiful tonight. The lights remind me of that Christmas when we got lost and pretended we weren't. I still catch myself looking for you in crowded places."</p>
+    </div>
+
+    <div class="letter reveal" data-label="March 17">
+      <p><em>March 17.</em></p>
+      <p>"I saw someone wearing your favorite jacket today. For three seconds, my heart forgot what reality looked like."</p>
+    </div>
+
+    <p class="reveal">I never published them. Not because they weren't good enough. But because every sentence belonged to him. And some stories aren't meant to be shared with the world. Only with the person they were written for.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One night, unable to sleep, I opened the folder again. The oldest document sat at the very top. Written the night Aarav left. I had never been brave enough to read it. Until now.</p>
+
+    <p class="reveal">My fingers hovered over the screen. Not because I was scared. Because I remembered. And sometimes memories weigh more than grief itself. I clicked. The room glowed softly in the darkness. And there she was. The old version of me. The girl who still believed love could survive distance. The girl who thought goodbye was temporary. The girl who still sounded hopeful.</p>
+
+    <p class="beat rose reveal">And for the first time in two years... I began to read.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Some stories remain unfinished not because the writer gave up.</p>
+    <p>But because her heart never found the courage to write the ending.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 3 ═══════════════ -->
+<section class="chapter" id="ch3">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Three</p>
+    <span class="ch-num">03</span>
+    <h2 class="ch-title">The Version of You <em>I Remember</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">There are two versions of every person we lose.</p>
+    <p class="reveal">The one who existed. And the one memory creates. The second one is always harder to forget.</p>
+
+    <p class="reveal">Because memories don't keep the bad days. They don't keep the arguments. The silences. The disappointments. They keep the laughter. The warmth. The moments that made you believe forever was a real thing.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">For days after the bookstore, I couldn't write, which was ironic — writing had always been my escape, my refuge, my way of making sense of things that didn't make sense. But every sentence I started somehow found its way back to him. Every character carried pieces of Aarav. Every love story sounded like us. Every ending felt wrong.</p>
+
+    <p class="reveal">One evening, frustrated, I closed my laptop and went for a walk. The city was glowing beneath the rain. Streetlights blurred against wet pavement. People hurried home. Couples shared umbrellas. Strangers passed without looking at each other. And somehow all of it felt unbearably lonely.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">I found myself standing outside a small coffee shop — our coffee shop, the place where Aarav had once spent three hours convincing me that pineapple belonged on pizza, where he accidentally spilled coffee on my manuscript and spent a week apologizing for it, where we used to sit by the window and talk about futures that never happened.</p>
+
+    <p class="beat muted reveal">After two years, my feet still remembered places my heart pretended to forget.</p>
+
+    <p class="reveal">So I went inside. The café looked different. New chairs. New paint. Different music. But some things remained the same. The smell of coffee. The sound of rain against the glass. The empty seat across from me. The one that used to belong to him.</p>
+
+    <p class="reveal">I ordered a coffee and opened my notebook. A blank page stared back. I wrote three words. <em>"Aarav was here."</em> Then immediately crossed them out. Because he wasn't. That was the problem. He wasn't here. And somehow that still hurt.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">I sat there for almost an hour. Thinking. Remembering. Missing. Until a question appeared in my mind. One I had spent years avoiding.</p>
+
+    <p class="beat reveal">Did I miss Aarav?</p>
+    <p class="beat rose reveal">Or did I miss the girl I used to be when I loved him?</p>
+
+    <p class="reveal">The girl who believed everything would work out. The girl who wasn't afraid of getting hurt. The girl who thought some people stayed forever. Maybe that was who I was mourning. Not him. Her. And somehow... that realization felt even sadder. Because people come back sometimes. But old versions of ourselves rarely do.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>I kept searching for the boy I used to love.</p>
+    <p>Only to realize I was really searching for the girl I used to be.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 4 ═══════════════ -->
+<section class="chapter" id="ch4">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Four</p>
+    <span class="ch-num">04</span>
+    <h2 class="ch-title">The Letter I Was Never <em>Meant To Read</em></h2>
+  </div>
+
+  <div class="pull reveal">
+    <p>The cruelest goodbyes are not the ones we hear. They're the ones hidden inside words we never get to read.</p>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">The rain hadn't stopped for three days. Neither had my thoughts. That Saturday, I decided to clean my apartment. Not because it needed cleaning. Because I needed distraction. There is a difference. One is productive. The other is survival.</p>
+
+    <p class="reveal">I started with bookshelves, then drawers, then old storage boxes I hadn't opened in years. Most contained things people normally keep — receipts, photographs, movie tickets, birthday cards. Tiny pieces of lives we are afraid to forget.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">At the very bottom of one box sat an old notebook. Dust covered the cover. My handwriting covered the first page. I recognized it immediately. My first manuscript. The one I had started writing during college. The one I never finished.</p>
+
+    <p class="reveal">I flipped through the pages — old chapters, terrible dialogue, embarrassing descriptions. The kind of writing that makes you cringe years later.</p>
+
+    <p class="beat reveal">Then something fell out.</p>
+
+    <p class="reveal">A folded piece of paper. Yellowed slightly with time. My smile disappeared. I didn't recognize it. Slowly, I unfolded it. The moment I saw the handwriting... my heart stopped.</p>
+
+    <p class="beat rose reveal">Aarav.</p>
+
+    <p class="reveal">I would have recognized his handwriting anywhere. Messy. Slanted. As if his thoughts always moved faster than his pen.</p>
+
+    <div class="letter reveal" data-label="His letter">
+      <p>"If you're reading this, I'm sorry."</p>
+    </div>
+
+    <p class="reveal">I sat down. Not because I wanted to. Because my knees suddenly felt weak. The room became quiet. The rain outside faded. The world faded. Until there was only me. And that letter.</p>
+
+    <div class="letter reveal" data-label="His letter">
+      <p>"There are things I never told you."</p>
+    </div>
+
+    <p class="reveal">I stared at those words. Again. And again. And again. Because suddenly every memory felt unstable. Every certainty questionable. Every version of our ending incomplete. For two years I had believed I knew what happened. I thought Aarav stopped fighting. Stopped choosing us. Stopped loving me enough to stay.</p>
+
+    <p class="beat rose reveal">But what if I was wrong?</p>
+
+    <p class="reveal">My hands trembled. Not from fear. From possibility. I looked at the rest of the letter. Pages. Plural. Not a note. Not an apology. A story. His story. The story I had never heard. I swallowed hard. Took a shaky breath. And began to read.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Sometimes the past doesn't return to haunt us.</p>
+    <p>It returns because we never knew the whole truth.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 5 ═══════════════ -->
+<section class="chapter" id="ch5">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Five</p>
+    <span class="ch-num">05</span>
+    <h2 class="ch-title">The Truth He <em>Never Told Me</em></h2>
+  </div>
+
+  <div class="pull reveal">
+    <p>Sometimes the people who leave us aren't running away from love. They're running away from something they don't know how to survive.</p>
+  </div>
+
+  <div class="prose">
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>Rhythm,</p>
+      <p>If you're reading this, then I never had the courage to give this to you. There are things I never told you because I didn't know how. And maybe that's my biggest mistake.</p>
+    </div>
+
+    <p class="reveal">I stopped reading. Not because I wanted to. Because suddenly breathing felt difficult. Two years. For two years I had carried a version of our story. A version where Aarav left. A version where he stopped choosing me. A version where I wasn't enough. And now — for the first time — I wasn't sure any of it was true.</p>
+
+    <p class="reveal">I looked at the date. My heart sank. The letter had been written three days before our breakup. Three days. Which meant he hadn't written it afterward. He had written it before. Before the silence. Before the goodbye. Before everything fell apart.</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"You always thought I was strong. I let you believe that because I liked the way you looked at me. But the truth is... I've been falling apart for months."</p>
+      <br>
+      <p>"The panic attacks started last winter. At first I thought they would stop. Then they got worse. And eventually I became someone I didn't recognize."</p>
+    </div>
+
+    <p class="reveal">My hands started shaking. Because suddenly things began making sense. The late-night disappearances. The cancelled plans. The distant texts. The exhaustion in his eyes. The sadness he always brushed away with a smile. All those moments I thought he was pulling away from me. Maybe he had been struggling with himself.</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"I wanted to tell you. A hundred times, I wanted to tell you. But every time I imagined you worrying about me, I couldn't do it. You deserved someone whole. And I felt broken."</p>
+    </div>
+
+    <div class="heart reveal">♥</div>
+
+    <p class="reveal">A sob escaped before I could stop it. How many people destroy themselves trying not to burden the people they love?</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"I didn't leave because I stopped loving you. I left because loving you while hating myself felt impossible."</p>
+    </div>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">For two years I had asked myself the same question, over and over. Why wasn't I enough? Why didn't he stay? Why wasn't our love worth fighting for? And now I finally had an answer.</p>
+
+    <p class="beat reveal">It had never been about me.</p>
+    <p class="beat muted reveal">Not once.</p>
+
+    <p class="reveal">The tears came harder. Not because the pain disappeared. Because it changed shape. The heartbreak I had carried for years suddenly became something else. Something sadder. Something more complicated. Understanding.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>For years, I thought he broke my heart.</p>
+    <p>I never realized he was trying to survive his own.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 6 ═══════════════ -->
+<section class="chapter" id="ch6">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Six</p>
+    <span class="ch-num">06</span>
+    <h2 class="ch-title">The Boy Behind <em>The Smile</em></h2>
+  </div>
+
+  <div class="pull reveal">
+    <p>The saddest people are often the ones who spend the most time making sure everyone else is okay.</p>
+  </div>
+
+  <div class="prose">
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"You always loved the version of me that smiled. The version that made jokes when things got serious. The version that looked like he had everything figured out. I loved him too. The problem was... he wasn't real."</p>
+      <br>
+      <p>"I got so good at pretending that eventually nobody noticed I was drowning. Not my friends. Not my family. Not even you. And that's not your fault. I made sure nobody could see it."</p>
+    </div>
+
+    <p class="reveal">I remembered all the times I had asked if he was okay. All the times he smiled. All the times he said: <em>"I'm fine."</em> Such a small lie. Such a dangerous one.</p>
+
+    <p class="reveal">Because suddenly every memory looked different. The cancelled dates weren't rejection. The distance wasn't indifference. The silence wasn't lack of love. It was pain. Pain I never knew existed.</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"There were days when getting out of bed felt impossible. Days when I looked in the mirror and didn't recognize the person staring back. Days when loving you felt like the only good thing left in my life."</p>
+      <br>
+      <p>"The reason I left wasn't because I thought you deserved better. The truth is much uglier than that. I left because I was terrified that one day you would see the version of me I was hiding. And I couldn't survive losing you twice."</p>
+    </div>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">I closed my eyes. How lonely had he been? How scared? How exhausted? For two years, I had been angry at him. And now all I felt was grief. Not grief for us. Grief for him. For the boy who sat beside me carrying battles he never spoke about. The boy who laughed through pain. The boy who convinced himself that disappearing was kinder than staying.</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"If you're reading this, then maybe fate decided you deserved the truth. Maybe years have passed. Maybe you've already moved on. Honestly, I hope you have. Because if there's one thing I never wanted... it was for my brokenness to become your prison."</p>
+    </div>
+
+    <p class="reveal">The tears wouldn't stop anymore. Because he still sounded like Aarav. Still thinking about me. Still protecting me. Even in goodbye.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Sometimes the people who leave us aren't asking to be forgotten.</p>
+    <p>They're begging to be understood.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 7 ═══════════════ -->
+<section class="chapter" id="ch7">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Seven</p>
+    <span class="ch-num">07</span>
+    <h2 class="ch-title">The <em>Last Page</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">For a long moment, I just stared at the final page.</p>
+    <p class="reveal">The last page of a letter Aarav never sent. The last page of a version of him I had never known. Outside, the rain continued. Inside, everything felt still.</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"There's one more thing I need to tell you. The real reason I'm writing this letter."</p>
+      <br>
+      <p>"A few weeks ago, my father lost everything. His business. His savings. The house he spent twenty years building. What followed was worse. Debt collectors. Lawyers. Threats. The kind of stress that changes a family overnight."</p>
+      <br>
+      <p>"I never told you because I knew what you would do. You would've stayed. You would've helped. You would've carried my problems like they were your own. And I couldn't let that happen."</p>
+      <br>
+      <p>"I kept telling myself things would get better. That once the storm passed, I would come back and explain. But storms don't always end when we expect them to."</p>
+    </div>
+
+    <p class="reveal">For two years I had believed he chose to leave. But according to this letter... he planned to return.</p>
+
+    <div class="letter reveal" data-label="Aarav's letter">
+      <p>"If you're reading this years from now, there's a chance you've already forgotten me. Honestly, I hope you have. You deserve peace."</p>
+      <br>
+      <p>"If life is kind, maybe we'll meet again someday. And if we do... I hope you look happy."</p>
+    </div>
+
+    <p class="reveal">I laughed through tears. A sad laugh. A broken laugh. Because even now, he still didn't understand. I never forgot him. Not once.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Slowly, I picked up my phone. Opened my contacts. And stared at a name I hadn't called in two years.</p>
+
+    <p class="beat rose reveal" style="letter-spacing:0.2em;">Aarav.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Some people leave your life and become a memory.</p>
+    <p>Others leave your life and become a question that only they can answer.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 8 ═══════════════ -->
+<section class="chapter" id="ch8">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Eight</p>
+    <span class="ch-num">08</span>
+    <h2 class="ch-title">The Call I Never <em>Thought I'd Make</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">My thumb hovered above his name.</p>
+    <p class="reveal">Aarav. Two years. Seven hundred and thirty days. Thousands of moments where I wanted to call him. Thousands more where I convinced myself not to. And now, after everything I had just read, one question echoed inside me.</p>
+    <p class="beat rose reveal">What if I had been wrong?</p>
+
+    <p class="reveal">I pressed the call button. Then immediately panicked. The phone rang once. Twice. Three times. My heart pounded so loudly I couldn't hear anything else. Four times. Five. Then the line connected.</p>
+
+    <p class="beat reveal">"Rhythm?"</p>
+
+    <p class="reveal">His voice. Two years later and my heart still recognized it instantly. I closed my eyes, and suddenly twenty-two felt like nineteen again. "Hi." A soft, nervous laugh came through the phone. "Hi."</p>
+
+    <p class="beat muted reveal">How do you fit two years of heartbreak into a single conversation?</p>
+
+    <p class="reveal">"I didn't think you'd ever call." "I didn't think I would either." Then I said the words that changed everything.</p>
+
+    <p class="beat rose reveal">"I found your letter."</p>
+
+    <p class="reveal">The silence on the other end was immediate. Heavy. Shocked. "What?" "Your letter. The one you never gave me." "...You read it?" "Every word."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">"Why didn't you tell me?" A long silence. "Because I was ashamed. I couldn't fix anything, Rhythm. I couldn't fix my family. I couldn't fix myself. And I couldn't stand the idea of you watching me fall apart."</p>
+
+    <p class="beat reveal">"You should've let me stay."</p>
+    <p class="reveal">"I know." "We lost so much time." "I think about that every day."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Then Aarav spoke again. "Rhythm?" "Yeah?" Another pause.</p>
+
+    <p class="beat rose reveal">"If I asked to see you again... would you come?"</p>
+
+    <p class="reveal">For the first time in two years... I didn't know the answer.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Sometimes closure isn't the end of a story.</p>
+    <p>Sometimes it's the beginning of the one that should have happened all along.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 9 ═══════════════ -->
+<section class="chapter" id="ch9">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Nine</p>
+    <span class="ch-num">09</span>
+    <h2 class="ch-title">The Space Between <em>Then and Now</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">"Okay," I said. "Okay?" he repeated. "Don't make me repeat it." For the first time during the call, he laughed. Actually laughed. And something inside me remembered exactly why I had fallen in love with him.</p>
+
+    <p class="beat reveal">Tomorrow. Such a simple word. Such a terrifying one.</p>
+
+    <p class="reveal">That night I barely slept. Every memory seemed awake. Every question louder. What if he looked at me differently? What if I looked at him differently? What if the distance had changed everything? Or worse — what if it hadn't changed anything at all?</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Morning arrived too quickly. I changed outfits three times. Then four. Then gave up entirely. Because no amount of preparation could prepare me for seeing someone who once knew every version of me.</p>
+
+    <p class="reveal">The café was small and quiet. I arrived first, of course — I had always been early, Aarav had always been late, some things never change. I ordered coffee, sat by the window, and waited.</p>
+
+    <p class="beat reveal">And then the door opened.</p>
+    <p class="beat rose reveal">My heart recognized him before my eyes did.</p>
+
+    <p class="reveal">Aarav. For a second, everything disappeared. The people. The music. The city outside. Just him. Standing there. Looking at me. And suddenly two years didn't feel like two years. They felt like a single unfinished sentence.</p>
+
+    <p class="reveal">He looked different. Older. More tired. More real. For the first time, I wasn't looking at the version of Aarav I remembered. I was looking at the version that survived. His eyes met mine. And neither of us moved. Then slowly... he smiled. Not the smile from old photographs. A quieter one. A sadder one. A genuine one. And somehow I loved that smile more. Because it wasn't hiding anything.</p>
+
+    <p class="reveal">"Hi, Rhythm." "Hi, Aarav." Neither of us sat down. We just looked at each other, trying to understand how someone could feel familiar and unfamiliar at the same time. "You cut your hair." I laughed. "That's what you noticed?" "It's the first thing I noticed."</p>
+
+    <p class="beat rose reveal">And just like that, the distance between then and now became a little smaller.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>We spent years mourning what we had lost.</p>
+    <p>Neither of us realized we were about to discover who we'd become.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 10 ═══════════════ -->
+<section class="chapter" id="ch10">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Ten</p>
+    <span class="ch-num">10</span>
+    <h2 class="ch-title">Why Didn't You <em>Come Back?</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">For a while, we talked about ordinary things. Work. Books. The city. Life. The safe topics. The ones people use when they're standing too close to something painful. Then the silence arrived. The kind where both people know there's still something waiting to be said.</p>
+
+    <p class="beat rose reveal">"If you loved me that much... why didn't you come back?"</p>
+
+    <p class="reveal">Aarav looked down, not surprised, as if he'd been expecting the question from the moment he walked in. He laughed softly — a sad laugh, the kind that belongs to old regrets. "Because I was a coward." "No." "Rhythm—" "No. You were scared. You were hurting. You made terrible decisions. But you weren't a coward."</p>
+
+    <p class="reveal">"Then maybe I was selfish." He looked away. "I kept telling myself I'd come back when things got better. When my family recovered. When I felt okay again. When I became someone worthy of you. The problem was... every time one thing got better, something else went wrong."</p>
+
+    <p class="reveal">"I thought about calling you hundreds of times." "Hundreds?" "I knew your number by memory. Still do." I looked away immediately. Because somehow that hurt more. "I would pick up my phone. Type your name. Stare at it for ten minutes. And then convince myself you were happier without me."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">"We were idiots." The words slipped out. Aarav laughed. Actually laughed. "Yeah. We really were."</p>
+
+    <p class="reveal">Then I whispered the thing I had never admitted. Not to him. Not to anyone.</p>
+
+    <p class="beat reveal">"I waited."</p>
+    <p class="reveal">Aarav froze. "I waited longer than I should have. Every unknown number. Every notification. Every birthday. A part of me thought you'd come back."</p>
+
+    <p class="reveal">When I finally looked up, his eyes were shining — not with happiness, with heartbreak. Now he knew: we had both been standing on opposite sides of the same door, waiting for the other person to open it.</p>
+
+    <p class="beat rose reveal" style="font-size:clamp(24px,3.5vw,38px);">"I never stopped loving you."</p>
+
+    <p class="reveal">The world stopped. Quietly, like a heartbeat skipping once, then twice, then forgetting how to continue.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>We lost two years to silence.</p>
+    <p>And in a single sentence, neither of us knew what to do with the truth that remained.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 11 ═══════════════ -->
+<section class="chapter" id="ch11">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Eleven</p>
+    <span class="ch-num">11</span>
+    <h2 class="ch-title">The Love That <em>Never Left</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">I should have said something. Anything. Instead, I just stared at him. Because after spending two years teaching myself how to live without Aarav... I wasn't prepared to hear that. For so long, love had been something I remembered. A chapter. A memory. But now it was sitting across from me. Breathing. Looking back at me. Real.</p>
+
+    <p class="reveal">"Say something," he said, his voice almost a whisper. I laughed softly. "You disappear for two years. You break my heart. You come back. And then casually tell me you've loved me this whole time?" He rubbed a hand across his face. "When you say it like that..." "Because that's exactly how it happened." To my surprise, he smiled — and somehow that made it harder to stay angry. I hated that.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">"I don't expect anything," he said. "I'm not asking you to forgive me. I'm not asking you to come back. I'm not asking for another chance. I just wanted you to know the truth." That would've been easier if he had asked for something. But he didn't. He simply gave me honesty. And somehow honesty was harder to fight.</p>
+
+    <p class="reveal">"Aarav." "Yeah?" "There wasn't a single book I wrote that didn't have a piece of you in it." His eyes widened slightly. "There wasn't a birthday where I didn't think about calling. There wasn't a year where I completely forgot you."</p>
+
+    <p class="reveal">And for the first time that afternoon... I saw hope. Not certainty. Not expectation. Hope. The fragile kind. The dangerous kind. The kind that breaks easily.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">As we stood to leave, Aarav hesitated. "Rhythm?" "Yeah?" "Can I ask you something?" "Depends." A faint smile appeared. "Would you let me walk you home?"</p>
+
+    <p class="reveal">Such a small question. Such a dangerous one. Because once upon a time... walking home together had been our favorite thing. And suddenly I realized something.</p>
+
+    <p class="beat reveal">The hardest part wasn't falling in love again.</p>
+    <p class="beat rose reveal">The hardest part was trusting that this time, he would stay.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Love wasn't the thing we had lost.</p>
+    <p>Trust was.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 12 ═══════════════ -->
+<section class="chapter" id="ch12">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Twelve</p>
+    <span class="ch-num">12</span>
+    <h2 class="ch-title">Learning <em>You Again</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">The first time Aarav and I met after the café, nothing dramatic happened. No confessions. No stolen kisses. No movie-worthy moments. We just walked. Through streets we used to know. Past places that had changed. Past places that hadn't.</p>
+
+    <p class="reveal">The old Aarav knew exactly how I took my coffee; the new Aarav preferred tea. The old Aarav hated waking up early; the new Aarav was somehow jogging at six in the morning, voluntarily, like a psychopath. When I pointed that out, he laughed. "People change." "Not that much."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Over the next few weeks, we kept meeting. Sometimes for coffee. Sometimes for dinner. Sometimes for no reason at all. One evening he tried making pasta for me. The fire alarm became involved. I laughed so hard I cried. Aarav claimed the smoke detector was being dramatic. The smoke detector disagreed.</p>
+
+    <p class="beat reveal">For the first time in years, being around him felt easy.</p>
+    <p class="beat rose reveal">And that scared me.</p>
+    <p class="reveal">Because loving him had never been the difficult part. Trusting him again was.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One evening, while walking home, Aarav stopped. "What did you do?" I asked immediately. His grin returned. "I read your book." I froze. "No." "Yes." "You promised you wouldn't." "The male lead was obviously me." "He was not." "He literally drinks coffee the way I do." "Millions of people drink coffee that way."</p>
+
+    <p class="reveal">Aarav's smile softened. "You wrote about me." The words weren't teasing anymore. They were gentle. And somehow that made them harder to answer. "I wrote about missing someone," I said quietly.</p>
+
+    <p class="reveal">"So did I," he said. "You write?" "Not professionally. Mostly letters." The world suddenly felt very small. Because two years apart... and somehow we'd both been writing to people who weren't there.</p>
+
+    <p class="reveal">We just walked. Side by side. Like two people learning a language they used to speak fluently. Slowly. Carefully. Patiently. Learning each other again.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>The strangest thing about seeing him again wasn't realizing how much he'd changed.</p>
+    <p>It was realizing how much I still wanted to know the person he'd become.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 13 ═══════════════ -->
+<section class="chapter" id="ch13">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Thirteen</p>
+    <span class="ch-num">13</span>
+    <h2 class="ch-title">The <em>Second Chance</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">If someone had told me a year ago that Aarav and I would find our way back to each other, I would've laughed. Then probably cried. Then laughed again. Because for the longest time, getting him back felt impossible. Like wishing for a season that had already passed.</p>
+
+    <p class="reveal">Somewhere between the phone calls, the coffee dates, and the walks that lasted longer than they needed to, Aarav became my favorite part of the day again — not a memory, not a ghost, not a chapter I kept rereading. A person. Real, present, mine.</p>
+
+    <p class="beat reveal">The best part wasn't the big moments.</p>
+    <p class="beat muted reveal">It was the ordinary ones.</p>
+
+    <p class="reveal">The way he'd call me just to tell me something completely unimportant. The way he'd send me pictures of dogs he wanted to adopt. The way he'd steal fries from my plate and act shocked when I complained. As if he hadn't been doing that since college.</p>
+
+    <div class="letter reveal" data-label="His note">
+      <p>"Writers are supposed to write books, not become one."</p>
+      <p style="text-align:right; color: var(--muted);">— Aarav</p>
+    </div>
+
+    <p class="reveal">I laughed for five straight minutes. Then kept the note. Obviously.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One night, after dinner, we ended up on the rooftop. The city glittered beneath us. Aarav was lying beside me, pointing at stars and confidently giving them names that absolutely weren't correct. "That one is definitely Orion." "Aarav, that's a plane." He ignored me. As usual. I laughed. And he looked at me. Not the way people normally look at each other. The way someone looks at a miracle they thought they'd lost.</p>
+
+    <p class="reveal">The laughter faded. The world softened. And then he kissed me. Slowly. Carefully. Like he was still afraid I'd disappear. I kissed him back. Because I wasn't going anywhere.</p>
+
+    <p class="reveal">When we pulled apart, his forehead rested against mine. Neither of us spoke. We didn't need to. And for the first time since he left... I wasn't thinking about the past anymore. I was thinking about tomorrow.</p>
+
+    <p class="beat rose reveal">Maybe we were going to make it.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 14 ═══════════════ -->
+<section class="chapter" id="ch14">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Fourteen</p>
+    <span class="ch-num">14</span>
+    <h2 class="ch-title">The Life We <em>Got Back</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">I used to think if Aarav ever came back, every moment would feel extraordinary. I was wrong. The best parts were never the extraordinary moments. They were the ordinary ones.</p>
+
+    <p class="reveal">Like waking up to six missed calls because he accidentally fell asleep while we were talking. Or random pictures throughout the day. A dog. A sunset. A sandwich. No context. No explanation. Just Aarav being Aarav. When I asked why he sent them, his answer was always the same. "It made me think of you." The annoying thing was... that answer worked every single time.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One Saturday, my phone kept vibrating. Aarav. Again. I ignored it. Then a message arrived: "Emergency." I called him immediately. "What happened?" "Nothing." I closed my eyes. "Aarav." "I just missed you."</p>
+
+    <p class="reveal">The worst part? I smiled. The absolute worst part? He knew I smiled. "You're smiling, aren't you?" "No." "Liar."</p>
+
+    <p class="beat muted reveal">Unfortunately... he was correct. As usual.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">A few weeks later, my new book launched. The event hall was packed. I should've been nervous. Instead, I kept searching for one person. Aarav. When I finally found him standing near the back, holding flowers he definitely spent too much money on, I felt calmer immediately.</p>
+
+    <p class="reveal">"I'm proud of you." The words were simple. But they meant everything. Because years ago, when I wrote my first unfinished manuscript, Aarav was there. When I published my first book, he wasn't. And somehow, having him here now healed something I didn't know was still broken.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One evening, while walking home, Aarav suddenly grabbed my hand. "What?" He shrugged. "Nothing." "You definitely did that for a reason." "I did." "And?" A small smile. "I just wanted to make sure you were real."</p>
+
+    <p class="reveal">Years ago, I used to imagine what happiness would look like if Aarav ever came back. The reality was much simpler. It looked like shared coffees. Inside jokes. Warm hands. Late-night conversations. And knowing someone would be there tomorrow.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>For so long, happiness felt temporary.</p>
+    <p>Then Aarav came back, and somehow, forever stopped feeling impossible.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 15 ═══════════════ -->
+<section class="chapter" id="ch15">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Fifteen</p>
+    <span class="ch-num">15</span>
+    <h2 class="ch-title"><em>Home</em></h2>
+  </div>
+
+  <div class="pull reveal">
+    <p>Maybe home isn't a place. Maybe it's a person who makes the world feel quieter.</p>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">Aarav slowly became part of my life again. Not in a dramatic way. Not all at once. The way sunlight fills a room. The way a favorite song becomes familiar. The way home stops feeling empty.</p>
+
+    <p class="reveal">One Sunday morning, I woke up to twenty-three missed calls. Twenty-three. Panic immediately took over. I called him back. "Aarav!" "What?" "Why did you call me twenty-three times?" A pause. "Because you weren't answering." "A normal person would've called twice." "That sounds made up." I laughed so hard I almost dropped my phone.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One evening, Aarav came with me to visit my parents. The entire drive there, he looked calm. Relaxed. Confident. Liar. The second we reached the house, he became nervous. Extremely nervous. By the end of dinner, my mother loved him. My father tolerated him. Which was practically a blessing. On the drive back: "I think your dad hates me slightly less now." "Congratulations." "Thank you." His tone was completely serious. I laughed harder.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One night, after a long day, we sat on my apartment balcony. The city stretched endlessly beneath us. Aarav rested his head against my shoulder. "As a writer, you're incredibly dramatic." I gasped. "How dare you." "It's true." "Take it back." "No." I pushed him. He almost dropped his coffee. Justice.</p>
+
+    <p class="reveal">Then eventually the conversation faded. The comfortable kind of silence remained. The kind that only exists between people who know each other by heart. Aarav reached for my hand. I intertwined my fingers with his automatically. Like I had done a thousand times before. Like I would do a thousand times again.</p>
+
+    <p class="reveal">For years, I thought I wanted my old life back. But I didn't. Because this wasn't the old life. This wasn't the old Aarav. This wasn't the old me. And somehow... that made it even better.</p>
+
+    <p class="beat rose reveal">For the first time in a very long time... I wasn't missing him anymore. Because he was finally home.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 16 ═══════════════ -->
+<section class="chapter" id="ch16">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Sixteen</p>
+    <span class="ch-num">16</span>
+    <h2 class="ch-title"><em>Forever</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">By the time winter arrived, Aarav and I had become one of those couples. The annoying kind. The kind people roll their eyes at. The kind that somehow ends up matching outfits without trying. Honestly? We deserved the judgment.</p>
+
+    <p class="reveal">One Saturday, we drove three hours just to try a café someone recommended online. The coffee was terrible. The sandwiches were worse. Aarav still gave it five stars. "Why?" "Because you laughed the whole time."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One evening, I was curled up beside him on the couch. His arm around my shoulders. My head resting against his chest. Comfortable. Effortless. Home. Aarav was talking about the future. As usual. About sunlight. About bookshelves. About where my writing desk would go. About how we'd probably end up arguing over furniture. About how he'd eventually win those arguments. Delusional. Completely delusional.</p>
+
+    <p class="reveal">Then he said something. Something simple. Something ordinary. "I think we'd be really happy. A house. A dog. Your books everywhere. My coffee mysteriously disappearing." "By mysteriously, you mean you stealing it." "Details."</p>
+
+    <p class="reveal">The rain continued outside. The room felt warm. Safe. Perfect. And suddenly, I found myself imagining it. The house. The mornings. The years. The life.</p>
+
+    <p class="reveal">I waited for the excitement. For the butterflies. For the rush that used to arrive every time I imagined forever with him. I waited. And waited. And waited.</p>
+
+    <p class="beat rose reveal">Nothing came.</p>
+
+    <p class="reveal">Aarav was still talking. Still smiling. Still dreaming out loud. I smiled too. But for some reason... I couldn't stop staring at the silence inside my chest.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>The scary part wasn't what I felt.</p>
+    <p>It was what I didn't.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 17 ═══════════════ -->
+<section class="chapter" id="ch17">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Seventeen</p>
+    <span class="ch-num">17</span>
+    <h2 class="ch-title">The Feeling I <em>Couldn't Find</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">I told myself it was just a bad day.</p>
+    <p class="reveal">Everyone has them. Maybe I was tired. Maybe I was stressed. So I ignored it. The silence. The strange feeling. The missing butterflies. Because everything else was perfect. Aarav was perfect. Well. Not perfect. He still stole my fries. Still interrupted me while I was writing. Still forgot where he put his keys every single day. But he was good. Kind. Present. Everything I had once prayed for.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One evening we went to a bookstore. Aarav held up a book. "You'd like this." "Have you read it?" "No." "Then how do you know I'd like it?" He grinned. "Because I know you." And the scary thing was... he did. He knew how I took my coffee. He knew when I was lying. He knew when I was overwhelmed. He knew me.</p>
+
+    <p class="beat reveal">And I loved him.</p>
+    <p class="beat rose reveal">God. I loved him.</p>
+    <p class="beat reveal">That was what made everything so much worse.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Because every time I looked at him, I kept waiting. Waiting for something. A feeling. A spark. A rush. And every time... nothing happened. Not because I didn't care. Because I did. More than anyone. But it felt different now. Quieter. Softer. Smaller. Like looking at a photograph instead of standing inside the moment.</p>
+
+    <p class="reveal">That night, Aarav fell asleep beside me. And suddenly I remembered being nineteen. Remembered waiting all day for a single text. Remembered smiling at my phone like an idiot. Remembered my stomach doing backflips whenever he looked at me.</p>
+
+    <p class="beat reveal">Back then, loving him felt like standing in the middle of a thunderstorm.</p>
+    <p class="beat muted reveal">Now it felt like sitting beside a fireplace.</p>
+    <p class="reveal">Warm. Comfortable. Safe. But not the same.</p>
+
+    <p class="reveal">And for the first time... I wondered if I'd spent years trying to get back a feeling that only existed in memory. I looked down at our intertwined hands. The hands I used to dream about holding again. And quietly... so quietly I almost didn't hear myself...</p>
+
+    <p class="beat rose reveal">"What's wrong with me?"</p>
+
+    <p class="reveal">Aarav slept peacefully beside me. Unaware. And for the first time since he came back... I was afraid of the answer.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>I spent years wondering if he'd ever come back.</p>
+    <p>I never stopped to wonder what would happen if he did.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 18 ═══════════════ -->
+<section class="chapter" id="ch18">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Eighteen</p>
+    <span class="ch-num">18</span>
+    <h2 class="ch-title">The Conversation I Didn't <em>Want To Have</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">For two weeks, I convinced myself I was overthinking. For two weeks, I blamed stress. Anything that sounded less terrifying than the truth. I tried fixing it. I planned dates. Long drives. Movie nights. I revisited places that once made my heart race. I stood inside memories and waited for them to become feelings. They never did.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Until Aarav noticed. Of course he noticed. One evening he muted the television, and I knew immediately what was coming. "Rhythm. Talk to me." I smiled automatically — a dangerous habit. "Something's wrong," he said. I looked away, which answered his question.</p>
+
+    <p class="reveal">"Is it me?" The panic was instant. "No." Too fast. "Then tell me what's happening." I couldn't. Because saying it out loud would make it real. And I wasn't ready for real.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Then Aarav asked the question. "Do you still love me?" My eyes closed immediately. Because that wasn't the problem. That had never been the problem. When I looked at him again, my vision was blurry.</p>
+
+    <p class="beat rose reveal">"Yes." No hesitation. "Yes."</p>
+
+    <p class="reveal">Then finally I said the thing I'd been terrified to admit. "When you left... I waited. I waited for months. Then years. I waited until waiting hurt too much. So I buried everything. The hope. The dreams. The future. The version of me that couldn't imagine a life without you."</p>
+
+    <p class="reveal">"And now you're back. And I love you. I still love you. God, I still love you." Aarav looked shattered. Because he already knew there was a but coming. The kind of but that changes lives.</p>
+
+    <p class="beat rose reveal">"But I can't find her anymore."</p>
+
+    <p class="reveal">"What do you mean?" I shook my head. Crying now. "The girl who waited for you. The girl who got butterflies every time you texted. The girl who would've followed you anywhere. The girl who loved you so much she forgot how to love herself."</p>
+
+    <p class="beat reveal">"She didn't survive you leaving."</p>
+
+    <p class="reveal">The silence that followed was the saddest silence I'd ever heard. Because for the first time... Aarav understood. This wasn't rejection. This wasn't lack of love. This was grief. Years of grief. And grief changes people. Even when love survives.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>I thought losing him was the hardest thing I'd ever survive.</p>
+    <p>I was wrong. The hardest thing was realizing I had.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 19 ═══════════════ -->
+<section class="chapter" id="ch19">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Nineteen</p>
+    <span class="ch-num">19</span>
+    <h2 class="ch-title">The Silence <em>After</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="beat reveal">After that... neither of us spoke.</p>
+    <p class="reveal">Not immediately. Because what was there left to say? The truth sat between us. Quiet. Heavy. Impossible to ignore.</p>
+
+    <p class="reveal">Eventually, Aarav laughed. A small laugh. A broken one. "So that's it?" His voice was quiet. Not accusing. Not bitter. Just tired. I closed my eyes. "I don't know." And that was the worst part. I genuinely didn't.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">"Do you know what hurts the most?" Aarav's eyes were red. Not from anger. From trying not to cry. "I came back. I spent years wishing I could come back. And when I finally did..." He couldn't finish.</p>
+
+    <p class="reveal">I understood. Because I wished the same thing. For years. "No," he shook his head. "I don't think you do. Because if someone told me two years ago that I'd get everything back... that I'd get you back... and still lose you..."</p>
+
+    <p class="beat rose reveal">The room went silent.</p>
+
+    <p class="reveal">Because there was no resentment in his eyes. Only understanding. Painful. Beautiful. Understanding. And somehow... that broke my heart more than anything else.</p>
+
+    <p class="reveal">"You're not doing this on purpose." I shook my head. "I know." "You're not trying to hurt me." Another shake. "I know." The tears wouldn't stop. Because he kept understanding. Even now. Even after everything.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Then slowly... Aarav reached for my hand. The same hand he'd held for years. The same hand he'd found again. The same hand he might have to let go. I held his. Tightly. Desperately. Because neither of us was ready. Not yet. Not for goodbye.</p>
+
+    <p class="beat reveal">But somewhere deep down...</p>
+    <p class="beat reveal">I think we both knew.</p>
+    <p class="beat rose reveal">Love had survived. We hadn't.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>We got our second chance.</p>
+    <p>The tragedy was that it arrived after we'd already learned how to live without it.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 20 ═══════════════ -->
+<section class="chapter" id="ch20">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Twenty</p>
+    <span class="ch-num">20</span>
+    <h2 class="ch-title">The Last Honest <em>Conversation</em></h2>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">Aarav stayed for another hour. Maybe two. Neither of us checked the time. "When did you know?" he finally asked. "I don't know. There wasn't a moment. It wasn't like waking up one day and feeling different. It just..."</p>
+
+    <p class="beat rose reveal">Faded.</p>
+
+    <p class="reveal">Aarav closed his eyes. Like someone hearing a diagnosis they already suspected. "I hate that word." I laughed through tears. "Me too."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">"If I could go back..." His voice cracked. "I would've stayed. I would've stayed through everything. The panic attacks. The debt. The fear. All of it. I would've chosen you every single time." I started crying again. Not because it wasn't enough. Because it was. Too late.</p>
+
+    <p class="reveal">Aarav laughed softly. The saddest laugh I'd ever heard. "Look at us." I smiled through tears. "Yeah." "We finally figured everything out." "We finally got honest." "We finally got a second chance." My smile disappeared, and neither of us said why.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">Aarav smiled sadly. "I think nineteen-year-old me would've been really happy." The tears came instantly. Because nineteen-year-old me would've been too. She would've gotten everything she ever wanted. Him. Forever. Us.</p>
+
+    <p class="reveal">For the first time all night, Aarav squeezed my hand. Not desperately. Not hopefully. Gently. Like a goodbye neither of us was ready to say out loud.</p>
+
+    <p class="beat reveal">Love wasn't what we lost.</p>
+    <p class="beat rose reveal">Time was.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>Some conversations arrive exactly on time.</p>
+    <p>Ours arrived two years, three months, and one unrecognizable version of me too late.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ CH 21 ═══════════════ -->
+<section class="chapter" id="ch21">
+  <div class="reveal">
+    <p class="ch-tag">Chapter Twenty-One</p>
+    <span class="ch-num">21</span>
+    <h2 class="ch-title">The Goodbye We <em>Never Wanted</em></h2>
+  </div>
+
+  <div class="pull reveal">
+    <p>Sometimes love stays. It's the future that leaves.</p>
+  </div>
+
+  <div class="prose">
+    <p class="reveal">After that night, neither of us tried to fix it. Not because we didn't care. Because we cared too much. For weeks, Aarav and I continued meeting. Coffee. Dinner. Walks. Movies. The same things we'd always done. Only now, there was a sadness beneath everything. Like two people standing on opposite sides of a bridge they knew was collapsing. Still smiling. Still talking. Still pretending there was enough time.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">One evening, we found ourselves back on the rooftop. The same rooftop. The same city lights. The same skyline. The place where I once believed we'd gotten our happy ending. The wind was colder now. Or maybe that was just me.</p>
+
+    <p class="reveal">"I wish I had come back sooner." My heart broke. Because there it was. The one thing neither of us could change. Time. If he'd come back six months later. A year later. Even two years earlier. Maybe we'd be different. Maybe I'd still be her. But life doesn't work with maybes. It works with what happened. He left. I survived. And survival changed me.</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">"I keep thinking about nineteen-year-old us." A smile escaped me. A sad one. "Yeah." "They would've made it." The tears came instantly. Because he was right. Nineteen-year-old Rhythm would've chosen him. Every single time.</p>
+
+    <p class="reveal">Aarav looked at me. Really looked at me. For the first time in months, there was no hope in his eyes. No fear. No denial. Just acceptance. "Do you think we'll ever find our way back?" I thought about it. Really thought about it. And somehow... for the first time... I knew the answer.</p>
+
+    <p class="beat reveal">"No."</p>
+    <p class="reveal">Aarav closed his eyes. Not because he was surprised. Because he already knew. "I think we already did. We found our way back to each other. We just couldn't find our way back to ourselves."</p>
+
+    <div class="br reveal"><div class="br-dot"></div></div>
+
+    <p class="reveal">After a while, Aarav stood up. I knew. Before he said anything. I knew. He looked down at me. The girl he'd loved. The girl who loved him. The girl who couldn't become her old self again. And somehow... he smiled. A real smile. Not happy. Not sad. Just grateful.</p>
+
+    <p class="reveal">"Thank you." My chest tightened. "For what?" "For loving me." The tears returned immediately. Because after everything... that was still true. I had loved him. God. I had loved him.</p>
+
+    <p class="reveal">Aarav leaned down. Pressed a kiss against my forehead. And then he left. No promises. No dramatic goodbye. No see-you-soon. Just a quiet ending to a story that neither of us wanted to finish.</p>
+
+    <p class="reveal">I watched him walk away until he disappeared from sight. And for the first time... I didn't run after him. Not because I didn't want to. Because some people aren't meant to be chased.</p>
+
+    <p class="beat rose reveal">They're meant to be cherished. And then let go.</p>
+  </div>
+
+  <div class="ch-end reveal">
+    <p>We got our second chance. We got our closure. We got our truth.</p>
+    <p>The only thing we never got back... was us.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ AUTHOR'S NOTE ═══════════════ -->
+<section id="note">
+  <div id="note-inner">
+    <h2 class="reveal">Author's Note</h2>
+
+    <p class="reveal">If there's one thing this story taught me, it's this: value people while they're still there.</p>
+
+    <p class="reveal">Not when they're gone. Not when you've spent years missing them. Not when life finally gives them back. <strong>Now.</strong> While they're still choosing you. While the conversations are still happening. While the butterflies are still real. While the connection still feels alive.</p>
+
+    <p class="reveal">Because we spend so much time believing we'll always have another chance. Another conversation. Another tomorrow. Another opportunity to fix things. But life doesn't always work that way. Sometimes people leave. Sometimes circumstances win. Sometimes timing loses. And sometimes the person comes back... but the version of you that loved them doesn't.</p>
+
+    <p class="reveal">That's the tragedy nobody talks about. Not losing someone. Surviving them. Because survival changes people. The nights you cry yourself to sleep. The mornings you force yourself to get up. The months you spend pretending you're okay. All of that changes you. Quietly. Permanently.</p>
+
+    <p class="reveal">And one day, the person returns. The love returns. The memories return. But the feeling doesn't. Not because it wasn't real. Not because you didn't care enough. But because life only gives some feelings once. Some butterflies only happen once. Some versions of us only exist once. And once they're gone... you can't always call them back.</p>
+
+    <p class="reveal">So if you love someone, love them fully. Have the difficult conversations. Fight for what matters. Choose each other while you still can.</p>
+
+    <p class="reveal">Because one day you might get a second chance. And discover that what you were really searching for wasn't the person. It was the version of yourself that existed when you loved them. And that version might not be waiting anymore.</p>
+
+    <div class="final-quote reveal">
+      <p>"The greatest tragedy isn't that they never came back. The greatest tragedy is that they came back after you had already learned how to survive without them."</p>
+    </div>
+
+    <p class="reveal" style="margin-top:40px; font-family:'DM Sans', sans-serif; font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted);">— Rhythm</p>
+
+    <div class="heart" style="margin-top:56px; color:var(--blush);">♥</div>
+  </div>
+</section>
+
+<script>
+// ── NAV DOTS ──
+const ids = ['cover','ch1','ch2','ch3','ch4','ch5','ch6','ch7','ch8','ch9','ch10','ch11','ch12','ch13','ch14','ch15','ch16','ch17','ch18','ch19','ch20','ch21','note'];
+const labels = ['Cover','Ch 1','Ch 2','Ch 3','Ch 4','Ch 5','Ch 6','Ch 7','Ch 8','Ch 9','Ch 10','Ch 11','Ch 12','Ch 13','Ch 14','Ch 15','Ch 16','Ch 17','Ch 18','Ch 19','Ch 20','Ch 21','Author\'s Note'];
+const nav = document.getElementById('sidenav');
+
+ids.forEach((id, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  d.setAttribute('data-tip', labels[i]);
+  d.onclick = () => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  nav.appendChild(d);
+});
+
+const dots = document.querySelectorAll('.dot');
+
+// ── PROGRESS + PCT ──
+const bar = document.getElementById('bar');
+const pct = document.getElementById('pct');
+window.addEventListener('scroll', () => {
+  const p = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  bar.style.width = p + '%';
+  pct.textContent = Math.round(p) + '% read';
+});
+
+// ── ACTIVE DOT ──
+const secEls = ids.map(id => document.getElementById(id));
+const io2 = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const i = ids.indexOf(e.target.id);
+      dots.forEach(d => d.classList.remove('on'));
+      if (i >= 0) dots[i].classList.add('on');
+    }
+  });
+}, { threshold: 0.3 });
+secEls.forEach(el => el && io2.observe(el));
+
+// ── SCROLL REVEAL ──
+const els = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      e.target.style.transitionDelay = '0s';
+      e.target.classList.add('in');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+els.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
