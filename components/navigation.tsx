@@ -9,8 +9,6 @@ import { supabase } from '@/lib/supabase';
 const navLinks = [
   { href: '/', label: 'Home', icon: BookOpen },
   { href: '/discover', label: 'Discover', icon: Compass },
-  { href: '/studio', label: 'Studio', icon: PenLine },
-  { href: '/premium', label: 'Premium', icon: Crown },
 ];
 
 export function Navigation() {
@@ -93,14 +91,9 @@ export function Navigation() {
                 <User className="w-4 h-4" />
               </Link>
             ) : (
-              <>
-                <Link href="/login" className="btn-outline-gold px-5 py-2 rounded-lg">
-                  Sign In
-                </Link>
-                <Link href="/signup" className="btn-gold px-5 py-2 rounded-lg relative z-10">
-                  <span className="relative z-10">Begin</span>
-                </Link>
-              </>
+              <Link href="/login" className="btn-outline-gold px-5 py-2 rounded-lg">
+                Sign In
+              </Link>
             )}
           </div>
 
@@ -135,9 +128,6 @@ export function Navigation() {
               <div className="flex gap-2">
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 btn-outline-gold px-4 py-2.5 rounded-lg text-center">
                   Sign In
-                </Link>
-                <Link href="/signup" onClick={() => setMobileOpen(false)} className="flex-1 btn-gold px-4 py-2.5 rounded-lg text-center">
-                  <span className="relative z-10">Begin</span>
                 </Link>
               </div>
             )}

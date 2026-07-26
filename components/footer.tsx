@@ -45,7 +45,6 @@ export function Footer() {
                   { href: '/discover', label: 'Discover' },
                   { href: '/discover?sort=trending', label: 'Trending' },
                   { href: '/discover?sort=new', label: 'New Releases' },
-                  { href: '/premium', label: 'Premium' },
                 ].map((l) => (
                   <li key={l.label}>
                     <Link href={l.href} className="text-ivory/50 hover:text-gold transition-colors text-sm font-sans">
@@ -88,12 +87,6 @@ export function Footer() {
             <div className="flex items-center gap-5">
               <Link href="/discover" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-ivory/50 hover:text-gold hover:bg-gold/10 transition-all duration-300">
                 <BookOpen className="w-4 h-4" />
-              </Link>
-              <Link href="/studio" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-ivory/50 hover:text-gold hover:bg-gold/10 transition-all duration-300">
-                <Feather className="w-4 h-4" />
-              </Link>
-              <Link href="/premium" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-ivory/50 hover:text-gold hover:bg-gold/10 transition-all duration-300">
-                <Heart className="w-4 h-4" />
               </Link>
               <Link href="/login" className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-ivory/50 hover:text-gold hover:bg-gold/10 transition-all duration-300">
                 <Mail className="w-4 h-4" />

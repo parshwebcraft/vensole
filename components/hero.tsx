@@ -74,13 +74,6 @@ export function Hero() {
             </span>
             <ChevronRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
           </Link>
-          <Link
-            href="/signup"
-            className="btn-outline-gold px-8 py-4 rounded-xl flex items-center gap-2"
-          >
-            <Feather className="w-4 h-4" />
-            Begin Writing
-          </Link>
         </div>
 
 
