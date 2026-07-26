@@ -5,6 +5,8 @@ import { HomeSections } from '@/components/home-sections';
 import { Footer } from '@/components/footer';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 async function getData() {
   const [trending, newReleases, genres, featuredAuthors] = await Promise.all([
     supabase

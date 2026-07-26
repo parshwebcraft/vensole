@@ -4,6 +4,8 @@ import { Footer } from '@/components/footer';
 import { DiscoverClient } from '@/components/discover-client';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 async function getDiscoverData() {
   const [stories, genres] = await Promise.all([
     supabase

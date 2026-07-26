@@ -4,6 +4,8 @@ import { Footer } from '@/components/footer';
 import { ReaderClient } from '@/components/reader-client';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 async function getStory(slug: string) {
   const { data } = await supabase
     .from('stories')
