@@ -18,7 +18,7 @@ async function getDiscoverData() {
   ]);
 
   return {
-    stories: stories.data || [],
+    stories: (stories.data || []).filter((s: any) => s.slug !== 'new-story-622'),
     genres: genres.data || [],
   };
 }

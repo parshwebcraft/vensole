@@ -30,8 +30,8 @@ async function getData() {
   ]);
 
   return {
-    trending: trending.data || [],
-    newReleases: newReleases.data || [],
+    trending: (trending.data || []).filter((s: any) => s.slug !== 'new-story-622'),
+    newReleases: (newReleases.data || []).filter((s: any) => s.slug !== 'new-story-622'),
     genres: genres.data || [],
     featuredAuthors: featuredAuthors.data || [],
     continueReading: [] as any[],
