@@ -163,8 +163,11 @@ export function DiscoverClient({ stories, genres }: { stories: Story[]; genres: 
           <div className="space-y-4">
             {filtered.map((s) => (
               <div key={s.id} className="glass rounded-xl p-4 flex gap-4 hover:glow-gold transition-all duration-400">
-                <div className="w-20 h-28 rounded-lg overflow-hidden flex-shrink-0">
-                  <img src={s.cover_url || `https://picsum.photos/seed/${s.slug}/200/280`} alt={s.title} className="w-full h-full object-cover" />
+                <div className="w-20 h-28 rounded-lg overflow-hidden flex-shrink-0 bg-midnight flex items-center justify-center relative">
+                  {/* Blurred Background */}
+                  <img src={s.cover_url || `https://picsum.photos/seed/${s.slug}/200/280`} alt="" className="absolute inset-0 w-full h-full object-cover blur-sm opacity-40 scale-125 select-none pointer-events-none" />
+                  {/* Contained Crisp Cover */}
+                  <img src={s.cover_url || `https://picsum.photos/seed/${s.slug}/200/280`} alt={s.title} className="relative z-10 max-h-full max-w-full object-contain" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-serif text-xl text-midnight truncate">{s.title}</h3>

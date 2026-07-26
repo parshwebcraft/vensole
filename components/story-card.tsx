@@ -21,13 +21,20 @@ export function StoryCard({ story, index = 0 }: { story: Story; index?: number }
   return (
     <Link href={`/read/${story.slug}`} className="story-card group block overflow-hidden relative">
       {/* Cover */}
-      <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl bg-midnight flex items-center justify-center">
+        {/* Blurred Background */}
+        <img
+          src={cover}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-125 select-none pointer-events-none"
+        />
+        {/* Contained Crisp Cover */}
         <img
           src={cover}
           alt={story.title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="relative z-10 max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-midnight/80 via-midnight/10 to-transparent" />
+        <div className="absolute inset-0 z-20 bg-gradient-to-t from-midnight/90 via-midnight/10 to-transparent pointer-events-none" />
 
         {/* Premium badge */}
         {story.is_premium && (
@@ -43,7 +50,7 @@ export function StoryCard({ story, index = 0 }: { story: Story; index?: number }
         )}
 
         {/* Title overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
+        <div className="absolute bottom-0 left-0 right-0 p-4 z-30">
           <h3 className="font-serif text-xl text-ivory leading-tight mb-1 line-clamp-2">{story.title}</h3>
           {story.profiles && (
             <p className="text-xs text-ivory/60 font-sans">by {story.profiles.display_name || story.profiles.username}</p>
