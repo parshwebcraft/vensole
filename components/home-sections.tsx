@@ -105,46 +105,7 @@ export function HomeSections({
         </div>
       </Section>
 
-      {/* Featured Authors */}
-      {featuredAuthors.length > 0 && (
-        <Section
-          icon={<Users className="w-4 h-4" />}
-          label="Featured Authors"
-          title="Voices worth following"
-          href="/discover"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {featuredAuthors.map((author) => (
-              <Link
-                key={author.id}
-                href={`/profile/${author.username}`}
-                className="glass rounded-xl p-6 text-center hover:glow-gold transition-all duration-400 hover:scale-105 group"
-              >
-                <div className="relative w-20 h-20 mx-auto mb-4">
-                  <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gold/30 transition-transform group-hover:scale-110">
-                    <img
-                      src={author.avatar_url || `https://ui-avatars.com/api/?name=${author.display_name || author.username}&background=C8A46A&color=111111&size=200`}
-                      alt={author.display_name || author.username}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  {author.is_premium && (
-                    <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gold flex items-center justify-center">
-                      <Award className="w-3 h-3 text-midnight" />
-                    </div>
-                  )}
-                </div>
-                <h4 className="font-serif text-lg text-midnight">{author.display_name || author.username}</h4>
-                <p className="text-xs text-midnight/50 mt-1 line-clamp-2">{author.bio || 'Storyteller & dreamer'}</p>
-                <div className="flex justify-center gap-4 mt-3 text-xs text-midnight/40">
-                  <span>{author.stories_count} stories</span>
-                  <span>{author.followers_count} followers</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </Section>
-      )}
+
 
     </div>
   );

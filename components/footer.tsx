@@ -5,105 +5,64 @@ import { Feather, Heart, BookOpen, Mail } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="relative bg-midnight text-ivory py-16 px-6 overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-gold/5 blur-[100px]" />
+    <footer className="relative bg-midnight text-ivory py-12 px-6 overflow-hidden text-center">
+      {/* Top gold line accent */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-gold/5 blur-[100px]" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          {/* Brand */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <img src="/images/image.png" alt="VENSOUL" className="w-10 h-10 object-contain" />
-              <div>
-                <div className="font-serif text-2xl">VENSOUL</div>
-                <div className="text-[0.55rem] tracking-[0.3em] uppercase text-gold">Write • Feel • Connect</div>
-              </div>
-            </div>
-            <p className="text-ivory/40 text-sm leading-relaxed font-serif italic">
-              An emotional storytelling ecosystem where stories have souls.
-            </p>
-          </div>
-
-          {/* Explore */}
+      <div className="max-w-4xl mx-auto relative z-10 flex flex-col items-center gap-8">
+        {/* Brand Logo & Name */}
+        <div className="flex flex-col items-center gap-2">
+          <img src="/images/image.png" alt="VENSOUL" className="w-12 h-12 object-contain" />
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase text-gold mb-4 font-sans">Explore</h4>
-            <ul className="space-y-2">
-              {[
-                { href: '/discover', label: 'Discover' },
-                { href: '/discover?sort=trending', label: 'Trending' },
-                { href: '/discover?sort=new', label: 'New Releases' },
-                { href: '/premium', label: 'Premium' },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-ivory/50 hover:text-gold transition-colors text-sm font-sans">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Create */}
-          <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase text-gold mb-4 font-sans">Create</h4>
-            <ul className="space-y-2">
-              {[
-                { href: '/studio', label: 'Writing Studio' },
-                { href: '/studio', label: 'Drafts' },
-                { href: '/studio', label: 'Publish' },
-                { href: '/profile', label: 'My Profile' },
-              ].map((l) => (
-                <li key={l.label}>
-                  <Link href={l.href} className="text-ivory/50 hover:text-gold transition-colors text-sm font-sans">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* About */}
-          <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase text-gold mb-4 font-sans">About</h4>
-            <ul className="space-y-2">
-              {[
-                { href: '/discover', label: 'Our Mission' },
-                { href: '/discover', label: 'Community' },
-                { href: '/discover', label: 'Book Clubs' },
-                { href: '/discover', label: 'Contact' },
-              ].map((l) => (
-                <li key={l.label}>
-                  <Link href={l.href} className="text-ivory/50 hover:text-gold transition-colors text-sm font-sans">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="font-serif text-3xl tracking-wide text-ivory">VENSOUL</div>
+            <div className="text-[0.6rem] tracking-[0.35em] uppercase text-gold mt-1">Write • Feel • Connect</div>
           </div>
         </div>
 
-        <div className="ink-divider mb-8" />
+        {/* Tagline */}
+        <p className="text-ivory/50 text-sm leading-relaxed font-serif italic max-w-md">
+          An emotional storytelling ecosystem where stories have souls.
+        </p>
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-ivory/30 text-xs font-sans">
-            © {new Date().getFullYear()} VENSOUL. Every story has a soul.
-          </p>
-          <div className="flex items-center gap-6">
-            <Link href="/discover" className="text-ivory/40 hover:text-gold transition-colors">
-              <BookOpen className="w-4 h-4" />
+        {/* Navigation Links */}
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm font-sans my-2">
+          {[
+            { href: '/discover', label: 'Discover' },
+            { href: '/discover?sort=trending', label: 'Trending' },
+            { href: '/discover?sort=new', label: 'New Releases' },
+            { href: '/premium', label: 'Premium' },
+            { href: '/studio', label: 'Writing Studio' },
+          ].map((l) => (
+            <Link key={l.label} href={l.href} className="text-ivory/60 hover:text-gold transition-colors duration-300">
+              {l.label}
             </Link>
-            <Link href="/studio" className="text-ivory/40 hover:text-gold transition-colors">
-              <Feather className="w-4 h-4" />
-            </Link>
-            <Link href="/premium" className="text-ivory/40 hover:text-gold transition-colors">
-              <Heart className="w-4 h-4" />
-            </Link>
-            <Link href="/login" className="text-ivory/40 hover:text-gold transition-colors">
-              <Mail className="w-4 h-4" />
-            </Link>
-          </div>
+          ))}
         </div>
+
+        {/* Icons */}
+        <div className="flex items-center justify-center gap-6">
+          <Link href="/discover" className="text-ivory/40 hover:text-gold transition-colors duration-300">
+            <BookOpen className="w-4 h-4" />
+          </Link>
+          <Link href="/studio" className="text-ivory/40 hover:text-gold transition-colors duration-300">
+            <Feather className="w-4 h-4" />
+          </Link>
+          <Link href="/premium" className="text-ivory/40 hover:text-gold transition-colors duration-300">
+            <Heart className="w-4 h-4" />
+          </Link>
+          <Link href="/login" className="text-ivory/40 hover:text-gold transition-colors duration-300">
+            <Mail className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full max-w-md h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+
+        {/* Copyright */}
+        <p className="text-ivory/30 text-[0.7rem] tracking-wider font-sans">
+          © {new Date().getFullYear()} VENSOUL. Every story has a soul.
+        </p>
       </div>
     </footer>
   );
