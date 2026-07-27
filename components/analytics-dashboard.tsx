@@ -5,7 +5,12 @@ import { supabase } from '@/lib/supabase';
 import { Activity, Users, BookOpen, Crown, Globe, MapPin, Eye, RefreshCw, AlertCircle, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function AnalyticsDashboard() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
   const [analyticsLogs, setAnalyticsLogs] = useState<any[]>([]);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [totalVisits, setTotalVisits] = useState(0);
@@ -43,7 +48,29 @@ CREATE POLICY "Allow public select" ON analytics_logs FOR SELECT TO anon, authen
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: loginUsername, password: loginPassword }),
+      });
+      const data = await res.json();
+      if (data.authenticated) {
+        setIsAdmin(true);
+      } else {
+        alert(data.message || 'Invalid admin credentials');
+      }
+    } catch (err) {
+      alert('Authentication error. Please try again.');
+    }
+    setLoginLoading(false);
+  };
+
   const fetchData = async () => {
+    if (!isAdmin) return;
     setLoading(true);
     try {
       // 1. Try to fetch from analytics_logs
@@ -100,11 +127,59 @@ CREATE POLICY "Allow public select" ON analytics_logs FOR SELECT TO anon, authen
   };
 
   useEffect(() => {
-    fetchData();
-    // Poll every 30 seconds for live updates
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    if (isAdmin) {
+      fetchData();
+      const interval = setInterval(fetchData, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAdmin]);
+
+  // Render Login Panel if not authenticated
+  if (!isAdmin) {
+    return (
+      <div className="pt-28 pb-20 min-h-screen bg-ivory paper-texture flex items-center justify-center">
+        <div className="text-center max-w-sm w-full px-6">
+          <div className="relative w-20 h-20 mx-auto mb-8 animate-fade-up">
+            <div className="absolute inset-0 blur-2xl bg-gold/20 rounded-full" />
+            <Crown className="w-20 h-20 text-gold relative z-10 animate-float" />
+          </div>
+          <h1 className="font-serif text-4xl text-midnight mb-2">Analytics Access</h1>
+          <p className="text-midnight/40 font-serif italic mb-8">Enter your admin credentials to view platform analytics.</p>
+          <form onSubmit={handleAdminLogin} className="glass rounded-2xl p-8 space-y-4 text-left shadow-soft border border-gold/15">
+            <div>
+              <label className="text-xs uppercase tracking-wider text-midnight/40 mb-1 block">Username</label>
+              <input 
+                type="text" 
+                value={loginUsername} 
+                onChange={e => setLoginUsername(e.target.value)}
+                placeholder="admin username"
+                className="w-full bg-ivory/50 border border-gold/20 rounded-xl px-4 py-3 text-midnight outline-none focus:border-gold transition-all font-sans" 
+                required 
+              />
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-wider text-midnight/40 mb-1 block">Password</label>
+              <input 
+                type="password" 
+                value={loginPassword} 
+                onChange={e => setLoginPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-ivory/50 border border-gold/20 rounded-xl px-4 py-3 text-midnight outline-none focus:border-gold transition-all font-sans" 
+                required 
+              />
+            </div>
+            <button 
+              type="submit" 
+              disabled={loginLoading}
+              className="w-full btn-gold py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider mt-4"
+            >
+              {loginLoading ? 'Authenticating...' : 'Sign In'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-ivory pt-28 pb-16 px-6 paper-texture">
