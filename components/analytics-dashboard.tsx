@@ -74,9 +74,9 @@ CREATE POLICY "Allow public select" ON analytics_logs FOR SELECT TO anon, authen
     setLoading(true);
     try {
       // 1. Try to fetch from analytics_logs
-      const p1 = supabase.from('analytics_logs').select('*').order('created_at', { ascending: false }).limit(250);
-      const p2 = supabase.from('analytics_logs').select('*', { count: 'exact', head: true });
-      const p3 = supabase.from('analytics_logs').select('*', { count: 'exact', head: true }).eq('story_slug', 'i-moved-on-my-heart-didnt');
+      const p1 = Promise.resolve(supabase.from('analytics_logs').select('*').order('created_at', { ascending: false }).limit(250));
+      const p2 = Promise.resolve(supabase.from('analytics_logs').select('*', { count: 'exact', head: true }));
+      const p3 = Promise.resolve(supabase.from('analytics_logs').select('*', { count: 'exact', head: true }).eq('story_slug', 'i-moved-on-my-heart-didnt'));
 
       const [analyticsRes, totalVisitsRes, bookClicksRes] = await Promise.all([
         p1.catch(e => ({ error: e, data: null })),

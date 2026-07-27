@@ -70,14 +70,14 @@ export function AdminClient() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const p1 = supabase.from('profiles').select('*').order('created_at', { ascending: false });
-      const p2 = supabase.from('stories').select('*, profiles!stories_author_id_fkey(username, display_name)').order('created_at', { ascending: false });
-      const p3 = supabase.from('genres').select('*').order('name');
-      const p4 = supabase.from('chapters').select('id');
-      const p5 = supabase.from('admin_questions').select('*').order('created_at');
-      const p6 = supabase.from('analytics_logs').select('*').order('created_at', { ascending: false }).limit(250);
-      const p7 = supabase.from('analytics_logs').select('*', { count: 'exact', head: true });
-      const p8 = supabase.from('analytics_logs').select('*', { count: 'exact', head: true }).eq('story_slug', 'i-moved-on-my-heart-didnt');
+      const p1 = Promise.resolve(supabase.from('profiles').select('*').order('created_at', { ascending: false }));
+      const p2 = Promise.resolve(supabase.from('stories').select('*, profiles!stories_author_id_fkey(username, display_name)').order('created_at', { ascending: false }));
+      const p3 = Promise.resolve(supabase.from('genres').select('*').order('name'));
+      const p4 = Promise.resolve(supabase.from('chapters').select('id'));
+      const p5 = Promise.resolve(supabase.from('admin_questions').select('*').order('created_at'));
+      const p6 = Promise.resolve(supabase.from('analytics_logs').select('*').order('created_at', { ascending: false }).limit(250));
+      const p7 = Promise.resolve(supabase.from('analytics_logs').select('*', { count: 'exact', head: true }));
+      const p8 = Promise.resolve(supabase.from('analytics_logs').select('*', { count: 'exact', head: true }).eq('story_slug', 'i-moved-on-my-heart-didnt'));
 
       const [profilesRes, storiesRes, genresRes, chaptersRes, questionsRes, analyticsRes, totalVisitsRes, bookClicksRes] = await Promise.all([
         p1.catch(e => ({ error: e, data: null })),
