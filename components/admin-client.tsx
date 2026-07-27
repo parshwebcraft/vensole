@@ -8,7 +8,7 @@ import {
   MessageSquare, X, Check, Edit2, Activity
 } from 'lucide-react';
 
-type Tab = 'stats' | 'users' | 'stories' | 'genres' | 'questions';
+type Tab = 'stats' | 'users' | 'stories' | 'genres' | 'questions' | 'analytics';
 
 export function AdminClient() {
   const [activeTab, setActiveTab] = useState<Tab>('stats');
@@ -26,6 +26,12 @@ export function AdminClient() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [userActivity, setUserActivity] = useState<any>(null);
   const [loadingActivity, setLoadingActivity] = useState(false);
+
+  // Analytics states
+  const [analyticsLogs, setAnalyticsLogs] = useState<any[]>([]);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
+  const [totalVisits, setTotalVisits] = useState(0);
+  const [bookClicks, setBookClicks] = useState(0);
 
   // Stats
   const [stats, setStats] = useState({ totalUsers: 0, totalStories: 0, premiumUsers: 0, totalChapters: 0 });
@@ -64,12 +70,24 @@ export function AdminClient() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [profilesRes, storiesRes, genresRes, chaptersRes, questionsRes] = await Promise.all([
-        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-        supabase.from('stories').select('*, profiles!stories_author_id_fkey(username, display_name)').order('created_at', { ascending: false }),
-        supabase.from('genres').select('*').order('name'),
-        supabase.from('chapters').select('id'),
-        supabase.from('admin_questions').select('*').order('created_at'),
+      const p1 = supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      const p2 = supabase.from('stories').select('*, profiles!stories_author_id_fkey(username, display_name)').order('created_at', { ascending: false });
+      const p3 = supabase.from('genres').select('*').order('name');
+      const p4 = supabase.from('chapters').select('id');
+      const p5 = supabase.from('admin_questions').select('*').order('created_at');
+      const p6 = supabase.from('analytics_logs').select('*').order('created_at', { ascending: false }).limit(250);
+      const p7 = supabase.from('analytics_logs').select('*', { count: 'exact', head: true });
+      const p8 = supabase.from('analytics_logs').select('*', { count: 'exact', head: true }).eq('story_slug', 'i-moved-on-my-heart-didnt');
+
+      const [profilesRes, storiesRes, genresRes, chaptersRes, questionsRes, analyticsRes, totalVisitsRes, bookClicksRes] = await Promise.all([
+        p1.catch(e => ({ error: e, data: null })),
+        p2.catch(e => ({ error: e, data: null })),
+        p3.catch(e => ({ error: e, data: null })),
+        p4.catch(e => ({ error: e, data: null })),
+        p5.catch(e => ({ error: e, data: null })),
+        p6.catch(e => ({ error: e, data: null })),
+        p7.catch(e => ({ error: e, count: null })),
+        p8.catch(e => ({ error: e, count: null })),
       ]);
 
       if (profilesRes.data) {
@@ -83,6 +101,16 @@ export function AdminClient() {
       if (genresRes.data) setGenres(genresRes.data);
       if (chaptersRes.data) setStats(prev => ({ ...prev, totalChapters: chaptersRes.data!.length }));
       if (questionsRes.data) setQuestions(questionsRes.data);
+
+      // Handle Analytics
+      if (analyticsRes.error || !analyticsRes.data) {
+        setAnalyticsEnabled(false);
+      } else {
+        setAnalyticsEnabled(true);
+        setAnalyticsLogs(analyticsRes.data || []);
+        if (totalVisitsRes.count !== null) setTotalVisits(totalVisitsRes.count);
+        if (bookClicksRes.count !== null) setBookClicks(bookClicksRes.count);
+      }
     } catch (err) { console.error(err); }
     setLoading(false);
   };
@@ -437,6 +465,7 @@ export function AdminClient() {
         <div className="flex gap-1 border-b border-gold/20 mb-8 overflow-x-auto pb-px">
           {([
             { id: 'stats', label: 'Dashboard Stats', icon: Sliders },
+            { id: 'analytics', label: 'Traffic Analytics', icon: Activity },
             { id: 'users', label: 'User Management', icon: Users },
             { id: 'stories', label: 'Story Management', icon: BookOpen },
             { id: 'genres', label: 'Genre Taxonomy', icon: Tag },
@@ -727,6 +756,226 @@ export function AdminClient() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Analytics */}
+            {activeTab === 'analytics' && (
+              <div className="space-y-8 animate-scale-in">
+                {!analyticsEnabled ? (
+                  <div className="glass rounded-2xl p-8 border border-red-500/20 bg-red-500/5 max-w-2xl mx-auto text-center space-y-4">
+                    <Activity className="w-12 h-12 text-red-500 mx-auto animate-pulse" />
+                    <h3 className="font-serif text-2xl text-midnight">Database Analytics Table Required</h3>
+                    <p className="text-sm text-midnight/60 leading-relaxed font-sans">
+                      To track visitors, geolocation, IP addresses, and story reads in real-time, you need to create the <code className="bg-white/60 px-1.5 py-0.5 rounded font-mono text-red-600">analytics_logs</code> table in your database.
+                    </p>
+                    <div className="text-left space-y-2">
+                      <p className="text-xs font-semibold text-midnight/50">Run this SQL code in your Supabase SQL Editor:</p>
+                      <pre className="bg-midnight text-ivory/80 text-xs p-4 rounded-xl font-mono overflow-x-auto select-all max-h-60">
+{`CREATE TABLE IF NOT EXISTS analytics_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  ip_address TEXT,
+  country TEXT,
+  region TEXT,
+  city TEXT,
+  latitude TEXT,
+  longitude TEXT,
+  page_url TEXT,
+  referrer TEXT,
+  user_agent TEXT,
+  story_slug TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE analytics_logs ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous inserts
+CREATE POLICY "Allow public insert" ON analytics_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
+
+-- Allow authenticated reads
+CREATE POLICY "Allow public select" ON analytics_logs FOR SELECT TO anon, authenticated USING (true);`}
+                      </pre>
+                    </div>
+                    <button onClick={fetchData} className="btn-gold px-6 py-2.5 rounded-lg text-xs">
+                      Refresh Check
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Analytics Overview Cards */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div className="glass rounded-xl p-6 hover:glow-gold transition-all">
+                        <p className="text-xs font-semibold text-midnight/40 uppercase tracking-wider mb-2">Total Website Hits</p>
+                        <h4 className="text-3xl font-serif text-gold-dark font-bold">{totalVisits.toLocaleString()}</h4>
+                        <p className="text-[0.65rem] text-midnight/30 mt-1">Overall raw page views</p>
+                      </div>
+                      <div className="glass rounded-xl p-6 hover:glow-gold transition-all">
+                        <p className="text-xs font-semibold text-midnight/40 uppercase tracking-wider mb-2">First Book Clicks (Reads)</p>
+                        <h4 className="text-3xl font-serif text-peacock-blue font-bold">{bookClicks.toLocaleString()}</h4>
+                        <p className="text-[0.65rem] text-midnight/30 mt-1">"I Moved On. My Heart Didn't."</p>
+                      </div>
+                      <div className="glass rounded-xl p-6 hover:glow-gold transition-all">
+                        <p className="text-xs font-semibold text-midnight/40 uppercase tracking-wider mb-2">Unique Visitors</p>
+                        <h4 className="text-3xl font-serif text-midnight font-bold">
+                          {new Set(analyticsLogs.map(l => l.ip_address)).size}
+                        </h4>
+                        <p className="text-[0.65rem] text-midnight/30 mt-1">Unique IP addresses logged</p>
+                      </div>
+                      <div className="glass rounded-xl p-6 hover:glow-gold transition-all">
+                        <p className="text-xs font-semibold text-midnight/40 uppercase tracking-wider mb-2">Cities Tracked</p>
+                        <h4 className="text-3xl font-serif text-bronze font-bold">
+                          {new Set(analyticsLogs.map(l => l.city).filter(c => c && c !== 'local' && c !== 'unknown')).size}
+                        </h4>
+                        <p className="text-[0.65rem] text-midnight/30 mt-1">Distinct geographical cities</p>
+                      </div>
+                    </div>
+
+                    <div className="grid lg:grid-cols-3 gap-8 items-start">
+                      {/* Left: Geo Distribution & Top Pages */}
+                      <div className="lg:col-span-1 space-y-6">
+                        {/* Top Countries */}
+                        <div className="glass rounded-xl p-6 border border-gold/15 space-y-4">
+                          <h3 className="font-serif text-lg text-midnight font-semibold border-b border-gold/10 pb-2">Top Countries</h3>
+                          <div className="space-y-3">
+                            {(() => {
+                              const countries: { [key: string]: number } = {};
+                              analyticsLogs.forEach(l => {
+                                const c = l.country || 'Unknown';
+                                countries[c] = (countries[c] || 0) + 1;
+                              });
+                              const sorted = Object.entries(countries)
+                                .sort((a, b) => b[1] - a[1])
+                                .slice(0, 5);
+                              const max = sorted[0]?.[1] || 1;
+                              return sorted.map(([c, count]) => (
+                                <div key={c} className="space-y-1">
+                                  <div className="flex justify-between text-xs font-medium">
+                                    <span className="text-midnight/70">{c}</span>
+                                    <span className="text-midnight">{count} ({analyticsLogs.length > 0 ? Math.round(count/analyticsLogs.length * 100) : 0}%)</span>
+                                  </div>
+                                  <div className="w-full h-1.5 bg-gold/5 rounded-full overflow-hidden">
+                                    <div className="h-full bg-gold rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                                  </div>
+                                </div>
+                              ));
+                            })()}
+                          </div>
+                        </div>
+
+                        {/* Top Cities */}
+                        <div className="glass rounded-xl p-6 border border-gold/15 space-y-4">
+                          <h3 className="font-serif text-lg text-midnight font-semibold border-b border-gold/10 pb-2">Top Cities</h3>
+                          <div className="space-y-3">
+                            {(() => {
+                              const cities: { [key: string]: number } = {};
+                              analyticsLogs.forEach(l => {
+                                const c = l.city === 'local' ? 'Localhost' : l.city || 'Unknown';
+                                if (c !== 'unknown') {
+                                  cities[c] = (cities[c] || 0) + 1;
+                                }
+                              });
+                              const sorted = Object.entries(cities)
+                                .sort((a, b) => b[1] - a[1])
+                                .slice(0, 5);
+                              const max = sorted[0]?.[1] || 1;
+                              return sorted.map(([c, count]) => (
+                                <div key={c} className="space-y-1">
+                                  <div className="flex justify-between text-xs font-medium">
+                                    <span className="text-midnight/70">{c}</span>
+                                    <span className="text-midnight">{count}</span>
+                                  </div>
+                                  <div className="w-full h-1.5 bg-gold/5 rounded-full overflow-hidden">
+                                    <div className="h-full bg-peacock-blue rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                                  </div>
+                                </div>
+                              ));
+                            })()}
+                          </div>
+                        </div>
+
+                        {/* Story Performance */}
+                        <div className="glass rounded-xl p-6 border border-gold/15 space-y-4">
+                          <h3 className="font-serif text-lg text-midnight font-semibold border-b border-gold/10 pb-2">Story Reads (Clicks)</h3>
+                          <div className="space-y-3">
+                            {(() => {
+                              const storyClicks: { [key: string]: number } = {};
+                              analyticsLogs.forEach(l => {
+                                if (l.story_slug) {
+                                  const name = l.story_slug === 'i-moved-on-my-heart-didnt' ? "I Moved On. My Heart Didn't." : l.story_slug;
+                                  storyClicks[name] = (storyClicks[name] || 0) + 1;
+                                }
+                              });
+                              const sorted = Object.entries(storyClicks)
+                                .sort((a, b) => b[1] - a[1]);
+                              if (sorted.length === 0) return <p className="text-xs text-midnight/40 text-center py-2">No book clicks logged yet.</p>;
+                              return sorted.map(([s, count]) => (
+                                <div key={s} className="flex justify-between items-center text-xs font-sans">
+                                  <span className="text-midnight/70 truncate max-w-[180px] font-medium">{s}</span>
+                                  <span className="bg-gold/10 text-gold-dark px-2.5 py-0.5 rounded-full font-mono text-[10px] font-semibold">{count} clicks</span>
+                                </div>
+                              ));
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Detailed Logs Table */}
+                      <div className="lg:col-span-2 glass rounded-xl p-6 border border-gold/15 space-y-4 overflow-hidden">
+                        <h3 className="font-serif text-lg text-midnight font-semibold border-b border-gold/10 pb-2">Live Visit Logs (Last 250)</h3>
+                        <div className="overflow-x-auto max-h-[600px] overflow-y-auto pr-1">
+                          <table className="w-full text-left border-collapse text-xs font-sans">
+                            <thead>
+                              <tr className="border-b border-gold/10 text-midnight/40 uppercase text-[10px] tracking-wider">
+                                <th className="py-2.5">Time</th>
+                                <th className="py-2.5">IP Address</th>
+                                <th className="py-2.5">Location (Geo)</th>
+                                <th className="py-2.5">Path / Page</th>
+                                <th className="py-2.5">Referrer</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gold/5">
+                              {analyticsLogs.length === 0 ? (
+                                <tr>
+                                  <td colSpan={5} className="py-8 text-center text-midnight/40">No visits logged yet. Keep browsing the site to test.</td>
+                                </tr>
+                              ) : (
+                                analyticsLogs.map(l => (
+                                  <tr key={l.id} className="hover:bg-gold/5 transition-colors">
+                                    <td className="py-3 text-midnight/50 whitespace-nowrap">
+                                      {new Date(l.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    </td>
+                                    <td className="py-3 font-mono font-medium text-midnight/80">{l.ip_address}</td>
+                                    <td className="py-3 text-midnight/70">
+                                      {l.city && l.city !== 'local' && l.city !== 'unknown' ? (
+                                        <span>{l.city}, {l.country}</span>
+                                      ) : l.ip_address === '127.0.0.1' || l.ip_address === '::1' ? (
+                                        <span className="text-gold font-medium">Localhost</span>
+                                      ) : (
+                                        <span className="text-midnight/40 italic">Unknown</span>
+                                      )}
+                                    </td>
+                                    <td className="py-3 font-mono">
+                                      <span className={`px-2 py-0.5 rounded text-[10px] ${
+                                        l.page_url?.startsWith('/read/') ? 'bg-peacock-blue/10 text-peacock-blue' :
+                                        l.page_url === '/' ? 'bg-gold/10 text-gold-dark' : 'bg-midnight/5 text-midnight/60'
+                                      }`}>
+                                        {l.page_url}
+                                      </span>
+                                    </td>
+                                    <td className="py-3 text-midnight/50 truncate max-w-[120px]" title={l.referrer}>
+                                      {l.referrer === 'direct' ? 'Direct' : l.referrer}
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
