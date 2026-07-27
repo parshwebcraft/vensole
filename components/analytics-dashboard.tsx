@@ -101,14 +101,14 @@ CREATE POLICY "Allow public select" ON analytics_logs FOR SELECT TO anon, authen
         
         // Generate mock logs
         const mockLogs = [
-          { id: '1', ip_address: '103.45.191.87', country: 'India', city: 'Mumbai', page_url: '/read/i-moved-on-my-heart-didnt', referrer: 'whatsapp', created_at: new Date(Date.now() - 1000 * 60 * 2).toISOString() },
-          { id: '2', ip_address: '122.161.44.12', country: 'India', city: 'New Delhi', page_url: '/', referrer: 'direct', created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
-          { id: '3', ip_address: '92.40.12.81', country: 'United Kingdom', city: 'London', page_url: '/read/i-moved-on-my-heart-didnt', referrer: 'google', created_at: new Date(Date.now() - 1000 * 60 * 12).toISOString() },
-          { id: '4', ip_address: '152.57.199.201', country: 'India', city: 'Bangalore', page_url: '/discover', referrer: 'direct', created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString() },
-          { id: '5', ip_address: '74.125.19.147', country: 'United States', city: 'New York', page_url: '/read/i-moved-on-my-heart-didnt', referrer: 'google', created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString() },
-          { id: '6', ip_address: '182.72.102.5', country: 'India', city: 'Chennai', page_url: '/', referrer: 'whatsapp', created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString() },
-          { id: '7', ip_address: '82.165.10.22', country: 'Germany', city: 'Berlin', page_url: '/discover', referrer: 'direct', created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
-          { id: '8', ip_address: '103.88.22.4', country: 'India', city: 'Kolkata', page_url: '/read/i-moved-on-my-heart-didnt', referrer: 'google', created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString() }
+          { id: '1', ip_address: '103.45.191.87', country: 'India', city: 'Mumbai', page_url: '/read/i-moved-on-my-heart-didnt', story_slug: 'i-moved-on-my-heart-didnt', referrer: 'whatsapp', created_at: new Date(Date.now() - 1000 * 60 * 2).toISOString() },
+          { id: '2', ip_address: '122.161.44.12', country: 'India', city: 'New Delhi', page_url: '/', story_slug: null, referrer: 'direct', created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
+          { id: '3', ip_address: '92.40.12.81', country: 'United Kingdom', city: 'London', page_url: '/read/i-moved-on-my-heart-didnt', story_slug: 'i-moved-on-my-heart-didnt', referrer: 'google', created_at: new Date(Date.now() - 1000 * 60 * 12).toISOString() },
+          { id: '4', ip_address: '152.57.199.201', country: 'India', city: 'Bangalore', page_url: '/discover', story_slug: null, referrer: 'direct', created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString() },
+          { id: '5', ip_address: '74.125.19.147', country: 'United States', city: 'New York', page_url: '/read/i-moved-on-my-heart-didnt', story_slug: 'i-moved-on-my-heart-didnt', referrer: 'google', created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString() },
+          { id: '6', ip_address: '182.72.102.5', country: 'India', city: 'Chennai', page_url: '/', story_slug: null, referrer: 'whatsapp', created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString() },
+          { id: '7', ip_address: '82.165.10.22', country: 'Germany', city: 'Berlin', page_url: '/discover', story_slug: null, referrer: 'direct', created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
+          { id: '8', ip_address: '103.88.22.4', country: 'India', city: 'Kolkata', page_url: '/read/i-moved-on-my-heart-didnt', story_slug: 'i-moved-on-my-heart-didnt', referrer: 'google', created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString() }
         ];
         
         setAnalyticsLogs(mockLogs);
