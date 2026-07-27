@@ -14,6 +14,14 @@ async function getStory(slug: string) {
     .eq('status', 'published')
     .maybeSingle();
 
+  if (data) {
+    // Increment the views_count of the story in the database
+    await supabase
+      .from('stories')
+      .update({ views_count: (data.views_count || 0) + 1 })
+      .eq('id', data.id);
+  }
+
   return data;
 }
 
