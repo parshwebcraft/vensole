@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -14,6 +14,7 @@ import { StoryCard } from '@/components/story-card';
 
 export function ProfileClient() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [tab, setTab] = useState<'stories' | 'collections' | 'activity'>('stories');
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -24,6 +25,8 @@ export function ProfileClient() {
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
+  const [avatarUrlState, setAvatarUrlState] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -44,6 +47,7 @@ export function ProfileClient() {
       setDisplayName(profileData?.display_name || '');
       setBio(profileData?.bio || '');
       setLocation(profileData?.location || '');
+      setAvatarUrlState(profileData?.avatar_url || null);
 
       const { data: storyData } = await supabase
         .from('stories')
@@ -55,6 +59,28 @@ export function ProfileClient() {
       setLoading(false);
     })();
   }, [router]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Only JPG, JPEG, and PNG files are supported');
+      return;
+    }
+
+    if (file.size > 1.5 * 1024 * 1024) {
+      toast.error('File size exceeds the 1.5MB limit');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatarUrlState(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   if (loading) {
     return (
@@ -74,10 +100,28 @@ export function ProfileClient() {
 
   const handleSaveProfile = async () => {
     try {
-      await supabase
+      const updates: any = { display_name: displayName, bio, location };
+      if (avatarUrlState) {
+        updates.avatar_url = avatarUrlState;
+      }
+
+      if (newPassword) {
+        if (newPassword.length < 6) {
+          toast.error('Password must be at least 6 characters long');
+          return;
+        }
+        const { error: passError } = await supabase.auth.updateUser({ password: newPassword });
+        if (passError) throw passError;
+        setNewPassword('');
+      }
+
+      const { error } = await supabase
         .from('profiles')
-        .update({ display_name: displayName, bio, location })
+        .update(updates)
         .eq('id', user.id);
+
+      if (error) throw error;
+      setProfile((prev: any) => ({ ...prev, ...updates }));
       setEditing(false);
       toast.success('Profile updated successfully');
     } catch (err: any) {
@@ -115,19 +159,36 @@ export function ProfileClient() {
 
         {/* Avatar */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-          <div className="relative">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ivory shadow-deep">
+          <div className="relative group">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ivory shadow-deep relative">
               <img
-                src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=300`}
+                src={avatarUrlState || profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=300`}
                 alt={profile?.display_name || profile?.username}
                 className="w-full h-full object-cover"
               />
+              {editing && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-ivory hover:text-gold transition-colors gap-1 text-xs"
+                >
+                  <Camera className="w-6 h-6 animate-pulse" />
+                  <span>Change Photo</span>
+                </button>
+              )}
             </div>
             {profile?.is_premium && (
               <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-gold flex items-center justify-center shadow-glow-gold animate-golden-pulse">
                 <Crown className="w-5 h-5 text-midnight" />
               </div>
             )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+              accept="image/jpeg, image/png, image/jpg"
+              className="hidden"
+            />
           </div>
         </div>
 
@@ -176,6 +237,16 @@ export function ProfileClient() {
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all"
+              />
+            </div>
+            <div>
+              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-2 block">Change Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password (min 6 characters)"
                 className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all"
               />
             </div>
@@ -245,20 +316,12 @@ export function ProfileClient() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-serif text-2xl text-midnight">My Stories</h2>
-              <Link href="/studio" className="btn-gold px-5 py-2.5 rounded-lg flex items-center gap-2 relative">
-                <Plus className="w-4 h-4 relative z-10" />
-                <span className="relative z-10">New Story</span>
-              </Link>
             </div>
             {stories.length === 0 ? (
               <div className="glass rounded-2xl p-16 text-center">
                 <Feather className="w-12 h-12 text-gold/30 mx-auto mb-4" />
                 <h3 className="font-serif text-2xl text-midnight/60 italic">No stories yet</h3>
-                <p className="text-midnight/40 mt-2 mb-6">Your bookshelf awaits its first story.</p>
-                <Link href="/studio" className="btn-gold px-6 py-3 rounded-lg inline-flex items-center gap-2 relative">
-                  <Edit3 className="w-4 h-4 relative z-10" />
-                  <span className="relative z-10">Start Writing</span>
-                </Link>
+                <p className="text-midnight/40 mt-2">Your bookshelf awaits its first story.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
