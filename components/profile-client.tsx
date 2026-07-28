@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   Feather, Edit3, Settings, LogOut, MapPin, Link as LinkIcon,
   Calendar, BookOpen, Clock, TrendingUp, ChevronRight, PenLine, Award, Camera,
-  Heart, Eye, Users, Crown, Plus, Grid3x3, List,
+  Heart, Eye, Users, Crown, Plus, Grid3x3, List, X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -159,43 +159,26 @@ export function ProfileClient() {
 
         {/* Avatar */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-          <div className="relative group">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ivory shadow-deep relative">
+          <div className="relative">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ivory shadow-deep">
               <img
-                src={avatarUrlState || profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=300`}
+                src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=300`}
                 alt={profile?.display_name || profile?.username}
                 className="w-full h-full object-cover"
               />
-              {editing && (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-ivory hover:text-gold transition-colors gap-1 text-xs"
-                >
-                  <Camera className="w-6 h-6 animate-pulse" />
-                  <span>Change Photo</span>
-                </button>
-              )}
             </div>
             {profile?.is_premium && (
               <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-gold flex items-center justify-center shadow-glow-gold animate-golden-pulse">
                 <Crown className="w-5 h-5 text-midnight" />
               </div>
             )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleAvatarChange}
-              accept="image/jpeg, image/png, image/jpg"
-              className="hidden"
-            />
           </div>
         </div>
 
         {/* Settings button */}
         <div className="absolute top-24 right-6 flex gap-2">
           <button
-            onClick={() => setEditing(!editing)}
+            onClick={() => setEditing(true)}
             className="glass-dark px-4 py-2 rounded-lg text-ivory/80 hover:text-gold transition-colors flex items-center gap-2 text-sm"
           >
             <Settings className="w-4 h-4" />
@@ -213,85 +196,37 @@ export function ProfileClient() {
 
       {/* Profile info */}
       <div className="pt-24 max-w-5xl mx-auto px-6 text-center">
-        {editing ? (
-          <div className="glass rounded-2xl p-8 max-w-lg mx-auto space-y-4 text-left">
-            <div>
-              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-2 block">Display Name</label>
-              <input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all"
-              />
-            </div>
-            <div>
-              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-2 block">Bio</label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={3}
-                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all resize-none"
-              />
-            </div>
-            <div>
-              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-2 block">Location</label>
-              <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all"
-              />
-            </div>
-            <div>
-              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-2 block">Change Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password (min 6 characters)"
-                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all"
-              />
-            </div>
-            <div className="flex gap-3 justify-end">
-              <button onClick={() => setEditing(false)} className="btn-outline-gold px-4 py-2 rounded-lg">Cancel</button>
-              <button onClick={handleSaveProfile} className="btn-gold px-4 py-2 rounded-lg relative">
-                <span className="relative z-10">Save</span>
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <h1 className="font-serif text-4xl md:text-5xl text-midnight mb-2">
-              {profile?.display_name || profile?.username || 'Writer'}
-            </h1>
-            <p className="text-gold text-sm tracking-wider uppercase">@{profile?.username}</p>
-            {profile?.bio && (
-              <p className="text-midnight/60 font-serif text-lg italic mt-4 max-w-xl mx-auto">{profile.bio}</p>
-            )}
-            <div className="flex items-center justify-center gap-6 mt-4 text-sm text-midnight/40">
-              {profile?.location && (
-                <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{profile.location}</span>
-              )}
-              <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Joined {new Date(profile?.created_at || Date.now()).toLocaleDateString('en', { month: 'long', year: 'numeric' })}</span>
-            </div>
-
-            {/* Stats */}
-            <div className="flex justify-center gap-8 md:gap-16 mt-8">
-              {[
-                { label: 'Stories', value: profile?.stories_count || stories.length, icon: BookOpen },
-                { label: 'Followers', value: profile?.followers_count || 0, icon: Users },
-                { label: 'Following', value: profile?.following_count || 0, icon: Heart },
-                { label: 'Total Views', value: stories.reduce((acc, s) => acc + s.views_count, 0), icon: Eye },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <stat.icon className="w-4 h-4 text-gold/50" />
-                  </div>
-                  <div className="font-serif text-2xl md:text-3xl text-midnight">{stat.value.toLocaleString()}</div>
-                  <div className="text-xs text-midnight/40 tracking-wider uppercase">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </>
+        <h1 className="font-serif text-4xl md:text-5xl text-midnight mb-2">
+          {profile?.display_name || profile?.username || 'Writer'}
+        </h1>
+        <p className="text-gold text-sm tracking-wider uppercase">@{profile?.username}</p>
+        {profile?.bio && (
+          <p className="text-midnight/60 font-serif text-lg italic mt-4 max-w-xl mx-auto">{profile.bio}</p>
         )}
+        <div className="flex items-center justify-center gap-6 mt-4 text-sm text-midnight/40">
+          {profile?.location && (
+            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{profile.location}</span>
+          )}
+          <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Joined {new Date(profile?.created_at || Date.now()).toLocaleDateString('en', { month: 'long', year: 'numeric' })}</span>
+        </div>
+
+        {/* Stats */}
+        <div className="flex justify-center gap-8 md:gap-16 mt-8">
+          {[
+            { label: 'Stories', value: profile?.stories_count || stories.length, icon: BookOpen },
+            { label: 'Followers', value: profile?.followers_count || 0, icon: Users },
+            { label: 'Following', value: profile?.following_count || 0, icon: Heart },
+            { label: 'Total Views', value: stories.reduce((acc, s) => acc + s.views_count, 0), icon: Eye },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <stat.icon className="w-4 h-4 text-gold/50" />
+              </div>
+              <div className="font-serif text-2xl md:text-3xl text-midnight">{stat.value.toLocaleString()}</div>
+              <div className="text-xs text-midnight/40 tracking-wider uppercase">{stat.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -363,6 +298,91 @@ export function ProfileClient() {
           </div>
         )}
       </div>
+
+      {/* Edit Profile Modal Dialog */}
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-midnight/70 backdrop-blur-md transition-all duration-300">
+          <div className="glass rounded-2xl p-8 max-w-lg w-full space-y-4 text-left border border-gold/15 relative shadow-deep animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setEditing(false)}
+              className="absolute top-4 right-4 text-midnight/40 hover:text-gold transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="font-serif text-2xl text-midnight mb-2">Edit Profile</h3>
+
+            {/* Avatar edit inside modal */}
+            <div className="flex flex-col items-center mb-4">
+              <div className="relative group w-24 h-24 rounded-full overflow-hidden border-2 border-gold/20 shadow-soft">
+                <img
+                  src={avatarUrlState || profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=150`}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-ivory hover:text-gold transition-colors gap-1 text-[0.65rem] font-sans"
+                >
+                  <Camera className="w-4 h-4 animate-pulse" />
+                  <span>Change Photo</span>
+                </button>
+              </div>
+              <span className="text-[0.65rem] text-midnight/40 mt-1.5 uppercase tracking-wider font-sans">JPG, JPEG or PNG (max 1.5MB)</span>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleAvatarChange}
+                accept="image/jpeg, image/png, image/jpg"
+                className="hidden"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-1 block font-sans">Display Name</label>
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all text-midnight font-sans"
+              />
+            </div>
+            <div>
+              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-1 block font-sans">Bio</label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={3}
+                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all resize-none text-midnight font-sans"
+              />
+            </div>
+            <div>
+              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-1 block font-sans">Location</label>
+              <input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all text-midnight font-sans"
+              />
+            </div>
+            <div>
+              <label className="text-xs tracking-wider uppercase text-midnight/40 mb-1 block font-sans">Change Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password (min 6 characters)"
+                className="w-full bg-ivory/50 border border-gold/20 rounded-lg px-4 py-2 outline-none focus:border-gold transition-all text-midnight placeholder:text-midnight/30 font-sans"
+              />
+            </div>
+            <div className="flex gap-3 justify-end pt-2">
+              <button onClick={() => setEditing(false)} className="btn-outline-gold px-4 py-2 rounded-lg text-xs font-sans">Cancel</button>
+              <button onClick={handleSaveProfile} className="btn-gold px-4 py-2 rounded-lg text-xs relative font-sans">
+                <span className="relative z-10">Save Changes</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
