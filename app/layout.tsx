@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 
 import { Toaster } from 'sonner';
 import { AnalyticsTracker } from '@/components/analytics-tracker';
+import { ContentProtector } from '@/components/content-protector';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Toaster position="bottom-center" />
         <AnalyticsTracker />
+        <ContentProtector />
       </body>
     </html>
   );

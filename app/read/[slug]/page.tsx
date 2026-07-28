@@ -32,7 +32,7 @@ export default function ReadPage() {
       // 2. Fetch the story details
       const { data } = await supabase
         .from('stories')
-        .select('*, profiles!stories_author_id_fkey(*), chapters(*)')
+        .select('*, profiles!stories_author_id_fkey(id, username, display_name, avatar_url, bio, role), chapters(*)')
         .eq('slug', slug)
         .eq('status', 'published')
         .maybeSingle();

@@ -11,20 +11,20 @@ async function getData() {
   const [trending, newReleases, genres, featuredAuthors] = await Promise.all([
     supabase
       .from('stories')
-      .select('*, profiles!stories_author_id_fkey(*)')
+      .select('*, profiles!stories_author_id_fkey(id, username, display_name, avatar_url, bio, role)')
       .eq('status', 'published')
       .order('views_count', { ascending: false })
       .limit(8),
     supabase
       .from('stories')
-      .select('*, profiles!stories_author_id_fkey(*)')
+      .select('*, profiles!stories_author_id_fkey(id, username, display_name, avatar_url, bio, role)')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
       .limit(8),
     supabase.from('genres').select('*').order('name'),
     supabase
       .from('profiles')
-      .select('*')
+      .select('id, username, display_name, avatar_url, bio, role, followers_count')
       .order('followers_count', { ascending: false })
       .limit(4),
   ]);

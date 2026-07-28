@@ -10,7 +10,7 @@ async function getDiscoverData() {
   const [stories, genres] = await Promise.all([
     supabase
       .from('stories')
-      .select('*, profiles!stories_author_id_fkey(*)')
+      .select('*, profiles!stories_author_id_fkey(id, username, display_name, avatar_url, bio, role)')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
       .limit(24),
