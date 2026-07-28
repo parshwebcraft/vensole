@@ -1,14 +1,34 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Feather, Mail, Lock, User, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { OnboardingModal } from '@/components/onboarding-modal';
 
+function isDisposableEmail(email: string) {
+  const disposableKeywords = [
+    'tempmail', 'temp-mail', 'mailinator', 'yopmail', '10minutemail',
+    'guerrillamail', 'dispostable', 'getairmail', 'throwawaymail',
+    'tempmailaddress', 'sharklasers', 'guerillamail', 'guerrillamailblock',
+    'pokemail', 'burnermail', 'trashmail', 'spambox', 'maildrop', 
+    'tempail', 'fakeinbox', 'moakt', 'tuta', 'spamex', 'mailnesia', 
+    'mytemp.email', 'disposable', 'anonymousemail', 'inboxkitten', 
+    'generator', 'crazymailing', 'boun.cr', 'armyspy', 'cuvox', 
+    'dayrep', 'fleckens', 'gustr', 'superrito', 'teleworm', 'trbvm',
+    'jetable', 'disposable', 'zillamail', 'mailtemporaire', 'yopmail'
+  ];
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (!domain) return false;
+  return disposableKeywords.some(keyword => domain.includes(keyword));
+}
+
 export function AuthClient({ mode }: { mode: 'login' | 'signup' }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams?.get('redirect') || '/profile';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -20,14 +40,20 @@ export function AuthClient({ mode }: { mode: 'login' | 'signup' }) {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getUser();
-      if (data.user) router.push('/profile');
+      if (data.user) router.push(redirectTo);
     })();
-  }, [router]);
+  }, [router, redirectTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    if (mode === 'signup' && isDisposableEmail(email)) {
+      setError('Temporary/disposable email addresses are not allowed. Please use a valid personal email.');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (mode === 'signup') {
@@ -50,7 +76,7 @@ export function AuthClient({ mode }: { mode: 'login' | 'signup' }) {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.push('/profile');
+        router.push(redirectTo);
       }
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
