@@ -15,7 +15,21 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string>('');
   const pathname = usePathname();
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url, display_name, username')
+      .eq('id', userId)
+      .maybeSingle();
+    if (data) {
+      setAvatarUrl(data.avatar_url);
+      setDisplayName(data.display_name || data.username || 'User');
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -27,9 +41,18 @@ export function Navigation() {
     (async () => {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
+      if (data.user) {
+        fetchProfile(data.user.id);
+      }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setAvatarUrl(null);
+        setDisplayName('');
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -86,9 +109,13 @@ export function Navigation() {
             {user ? (
               <Link
                 href="/profile"
-                className="w-9 h-9 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center text-gold hover:bg-gold/20 transition-all duration-300"
+                className="w-9 h-9 rounded-full overflow-hidden border border-gold/30 flex items-center justify-center hover:border-gold/60 transition-all duration-300"
               >
-                <User className="w-4 h-4" />
+                <img
+                  src={avatarUrl || `https://ui-avatars.com/api/?name=${displayName || 'User'}&background=C8A46A&color=111111&size=100`}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
               </Link>
             ) : (
               <Link href="/login" className="btn-outline-gold px-5 py-2 rounded-lg">
@@ -124,7 +151,22 @@ export function Navigation() {
               );
             })}
             <div className="ink-divider my-3" />
-            {!user && (
+            {user ? (
+              <Link
+                href="/profile"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-midnight hover:bg-gold/5 hover:text-gold transition-colors"
+              >
+                <div className="w-5 h-5 rounded-full overflow-hidden border border-gold/30">
+                  <img
+                    src={avatarUrl || `https://ui-avatars.com/api/?name=${displayName || 'User'}&background=C8A46A&color=111111&size=50`}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="font-sans text-sm">My Profile</span>
+              </Link>
+            ) : (
               <div className="flex gap-2">
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 btn-outline-gold px-4 py-2.5 rounded-lg text-center">
                   Sign In

@@ -157,24 +157,6 @@ export function ProfileClient() {
           ))}
         </div>
 
-        {/* Avatar */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-          <div className="relative">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ivory shadow-deep">
-              <img
-                src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=300`}
-                alt={profile?.display_name || profile?.username}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {profile?.is_premium && (
-              <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-gold flex items-center justify-center shadow-glow-gold animate-golden-pulse">
-                <Crown className="w-5 h-5 text-midnight" />
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Settings button */}
         <div className="absolute top-24 right-6 flex gap-2">
           <button
@@ -194,8 +176,26 @@ export function ProfileClient() {
         </div>
       </div>
 
+      {/* Avatar Container positioned halfway over the cover boundary */}
+      <div className="relative -mt-16 md:-mt-20 z-10 flex justify-center">
+        <div className="relative">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ivory shadow-deep bg-ivory">
+            <img
+              src={avatarUrlState || profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.display_name || profile?.username || 'User'}&background=C8A46A&color=111111&size=300`}
+              alt={profile?.display_name || profile?.username}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          {profile?.is_premium && (
+            <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-gold flex items-center justify-center shadow-glow-gold animate-golden-pulse">
+              <Crown className="w-5 h-5 text-midnight" />
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Profile info */}
-      <div className="pt-24 max-w-5xl mx-auto px-6 text-center">
+      <div className="pt-6 max-w-5xl mx-auto px-6 text-center">
         <h1 className="font-serif text-4xl md:text-5xl text-midnight mb-2">
           {profile?.display_name || profile?.username || 'Writer'}
         </h1>
