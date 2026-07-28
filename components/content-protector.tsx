@@ -7,8 +7,11 @@ export function ContentProtector() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Allow developer tools on admin and analytics routes for easy debugging
-    if (pathname.startsWith('/admin') || pathname.startsWith('/analytics')) {
+    // Allow developer tools on admin and analytics routes, or if secret debug parameters are present in the URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const isDebugMode = searchParams.get('debug') === 'true' || searchParams.get('dev') === 'true';
+
+    if (pathname.startsWith('/admin') || pathname.startsWith('/analytics') || isDebugMode) {
       return;
     }
 
