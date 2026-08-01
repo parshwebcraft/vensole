@@ -114,6 +114,15 @@ function run() {
   sql += `-- Run this script inside the Supabase SQL Editor\n`;
   sql += `-- =========================================================================\n\n`;
   sql += `CREATE EXTENSION IF NOT EXISTS pgcrypto;\n\n`;
+  sql += `-- Create helper function to increment views bypassing RLS\n`;
+  sql += `CREATE OR REPLACE FUNCTION increment_story_views(story_id uuid)\n`;
+  sql += `RETURNS void AS $$\n`;
+  sql += `BEGIN\n`;
+  sql += `  UPDATE stories\n`;
+  sql += `  SET views_count = COALESCE(views_count, 0) + 1\n`;
+  sql += `  WHERE id = story_id;\n`;
+  sql += `END;\n`;
+  sql += `$$ LANGUAGE plpgsql SECURITY DEFINER;\n\n`;
   
   sql += `DO $$\n`;
   sql += `DECLARE\n`;

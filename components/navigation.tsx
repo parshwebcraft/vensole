@@ -28,6 +28,21 @@ export function Navigation() {
     if (data) {
       setAvatarUrl(data.avatar_url);
       setDisplayName(data.display_name || data.username || 'User');
+    } else {
+      // Profile does not exist yet (e.g. signup RLS constraint). Create a default one on the fly.
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user && authData.user.id === userId) {
+        const emailName = authData.user.email?.split('@')[0] || 'user';
+        const defaultProfile = {
+          id: userId,
+          username: emailName,
+          display_name: emailName.charAt(0).toUpperCase() + emailName.slice(1),
+          role: 'reader'
+        };
+        await supabase.from('profiles').insert(defaultProfile);
+        setAvatarUrl(null);
+        setDisplayName(defaultProfile.display_name);
+      }
     }
   };
 

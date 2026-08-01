@@ -425,3 +425,13 @@ CREATE POLICY "admin_questions_select" ON admin_questions FOR SELECT TO anon, au
 -- but a strict RLS would be:
 DROP POLICY IF EXISTS "admin_questions_all_policy" ON admin_questions;
 CREATE POLICY "admin_questions_all_policy" ON admin_questions FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+-- FUNCTION TO INCREMENT VIEWS SAFELY BYPASSING RLS
+CREATE OR REPLACE FUNCTION increment_story_views(story_id uuid)
+RETURNS void AS $$
+BEGIN
+  UPDATE stories
+  SET views_count = COALESCE(views_count, 0) + 1
+  WHERE id = story_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

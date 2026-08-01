@@ -37,11 +37,30 @@ export function ProfileClient() {
       }
       setUser(user);
 
-      const { data: profileData } = await supabase
+      let profileData = null;
+      const { data: fetchResult } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .maybeSingle();
+
+      if (!fetchResult) {
+        const emailName = user.email?.split('@')[0] || 'user';
+        const defaultProfile = {
+          id: user.id,
+          username: emailName,
+          display_name: emailName.charAt(0).toUpperCase() + emailName.slice(1),
+          role: 'reader' as const
+        };
+        const { data: insertResult, error } = await supabase
+          .from('profiles')
+          .insert(defaultProfile)
+          .select()
+          .single();
+        profileData = !error && insertResult ? insertResult : defaultProfile;
+      } else {
+        profileData = fetchResult;
+      }
       
       setProfile(profileData);
       setDisplayName(profileData?.display_name || '');
@@ -115,13 +134,23 @@ export function ProfileClient() {
         setNewPassword('');
       }
 
+      const upsertData = {
+        id: user.id,
+        username: profile?.username || user.email?.split('@')[0] || 'user',
+        display_name: displayName,
+        bio,
+        location,
+        avatar_url: avatarUrlState || null,
+        role: profile?.role || 'reader',
+        updated_at: new Date().toISOString()
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+        .upsert(upsertData);
 
       if (error) throw error;
-      setProfile((prev: any) => ({ ...prev, ...updates }));
+      setProfile((prev: any) => ({ ...prev, ...upsertData }));
       setEditing(false);
       toast.success('Profile updated successfully');
     } catch (err: any) {

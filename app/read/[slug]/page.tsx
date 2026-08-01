@@ -39,11 +39,8 @@ export default function ReadPage() {
 
       if (data) {
         setStory(data);
-        // Increment the views_count of the story in the database
-        await supabase
-          .from('stories')
-          .update({ views_count: (data.views_count || 0) + 1 })
-          .eq('id', data.id);
+        // Increment the views_count of the story in the database securely via RPC
+        await supabase.rpc('increment_story_views', { story_id: data.id });
       }
       setLoading(false);
     })();

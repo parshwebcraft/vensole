@@ -5,6 +5,16 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Create helper function to increment views bypassing RLS
+CREATE OR REPLACE FUNCTION increment_story_views(story_id uuid)
+RETURNS void AS $$
+BEGIN
+  UPDATE stories
+  SET views_count = COALESCE(views_count, 0) + 1
+  WHERE id = story_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 DO $$
 DECLARE
   v_author_id uuid;
