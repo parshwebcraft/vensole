@@ -199,7 +199,7 @@ async function run() {
     title: "I Moved On. My Heart Didn't.",
     slug: "i-moved-on-my-heart-didnt",
     description: "A story about love that survives. Hearts that don't. And the terrifying distance between the two.",
-    cover_url: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop", 
+    cover_url: "/images/book_1_cover_full.jpg", 
     language: "en",
     status: "published",
     content_rating: "general",

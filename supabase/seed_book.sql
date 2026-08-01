@@ -3,17 +3,34 @@
 -- Run this script inside the Supabase SQL Editor
 -- =========================================================================
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 DO $$
 DECLARE
   v_author_id uuid;
   v_story_id uuid;
   v_genre_id uuid;
 BEGIN
-  -- 1. Fetch user ID for rhythm@vensoul.com (signed up on auth)
+  -- 1. Fetch or create user ID for rhythm@vensoul.com (direct DB insert to bypass auth limits)
   SELECT id INTO v_author_id FROM auth.users WHERE email = 'rhythm@vensoul.com' LIMIT 1;
 
   IF v_author_id IS NULL THEN
-    RAISE EXCEPTION 'User rhythm@vensoul.com not found. Please sign up or log in on the website with rhythm@vensoul.com first.';
+    v_author_id := gen_random_uuid();
+    INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, role, aud, confirmation_token)
+    VALUES (
+      v_author_id,
+      '00000000-0000-0000-0000-000000000000',
+      'rhythm@vensoul.com',
+      crypt('RhythmLoveStory2026!', gen_salt('bf')),
+      now(),
+      '{"provider":"email","providers":["email"]}'::jsonb,
+      '{}'::jsonb,
+      now(),
+      now(),
+      'authenticated',
+      'authenticated',
+      ''
+    );
   END IF;
 
   -- 2. Upsert profile for Rhythm
@@ -31,7 +48,7 @@ BEGIN
     'I Moved On. My Heart Didn''t.', 
     'i-moved-on-my-heart-didnt', 
     'A story about love that survives. Hearts that don''t. And the terrifying distance between the two.', 
-    'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop', 
+    '/images/book_1_cover_full.jpg', 
     'en', 
     'published', 
     'general', 

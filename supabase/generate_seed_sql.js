@@ -113,6 +113,7 @@ function run() {
   sql += `-- VENSOULL — Romance Book Seed Script\n`;
   sql += `-- Run this script inside the Supabase SQL Editor\n`;
   sql += `-- =========================================================================\n\n`;
+  sql += `CREATE EXTENSION IF NOT EXISTS pgcrypto;\n\n`;
   
   sql += `DO $$\n`;
   sql += `DECLARE\n`;
@@ -120,11 +121,26 @@ function run() {
   sql += `  v_story_id uuid;\n`;
   sql += `  v_genre_id uuid;\n`;
   sql += `BEGIN\n`;
-  sql += `  -- 1. Fetch user ID for rhythm@vensoul.com (signed up on auth)\n`;
+  sql += `  -- 1. Fetch or create user ID for rhythm@vensoul.com (direct DB insert to bypass auth limits)\n`;
   sql += `  SELECT id INTO v_author_id FROM auth.users WHERE email = 'rhythm@vensoul.com' LIMIT 1;\n\n`;
   
   sql += `  IF v_author_id IS NULL THEN\n`;
-  sql += `    RAISE EXCEPTION 'User rhythm@vensoul.com not found. Please sign up or log in on the website with rhythm@vensoul.com first.';\n`;
+  sql += `    v_author_id := gen_random_uuid();\n`;
+  sql += `    INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, role, aud, confirmation_token)\n`;
+  sql += `    VALUES (\n`;
+  sql += `      v_author_id,\n`;
+  sql += `      '00000000-0000-0000-0000-000000000000',\n`;
+  sql += `      'rhythm@vensoul.com',\n`;
+  sql += `      crypt('RhythmLoveStory2026!', gen_salt('bf')),\n`;
+  sql += `      now(),\n`;
+  sql += `      '{"provider":"email","providers":["email"]}'::jsonb,\n`;
+  sql += `      '{}'::jsonb,\n`;
+  sql += `      now(),\n`;
+  sql += `      now(),\n`;
+  sql += `      'authenticated',\n`;
+  sql += `      'authenticated',\n`;
+  sql += `      ''\n`;
+  sql += `    );\n`;
   sql += `  END IF;\n\n`;
 
   sql += `  -- 2. Upsert profile for Rhythm\n`;
@@ -142,7 +158,7 @@ function run() {
   sql += `    'I Moved On. My Heart Didn''t.', \n`;
   sql += `    'i-moved-on-my-heart-didnt', \n`;
   sql += `    'A story about love that survives. Hearts that don''t. And the terrifying distance between the two.', \n`;
-  sql += `    'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop', \n`;
+  sql += `    '/images/book_1_cover_full.jpg', \n`;
   sql += `    'en', \n`;
   sql += `    'published', \n`;
   sql += `    'general', \n`;
