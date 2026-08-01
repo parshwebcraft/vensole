@@ -14,7 +14,11 @@ async function getDiscoverData() {
       .eq('status', 'published')
       .order('created_at', { ascending: false })
       .limit(24),
-    supabase.from('genres').select('*').order('name'),
+    supabase
+      .from('genres')
+      .select('*, story_genres!inner(stories!inner(status))')
+      .eq('story_genres.stories.status', 'published')
+      .order('name'),
   ]);
 
   return {

@@ -21,7 +21,11 @@ async function getData() {
       .eq('status', 'published')
       .order('created_at', { ascending: false })
       .limit(8),
-    supabase.from('genres').select('*').order('name'),
+    supabase
+      .from('genres')
+      .select('*, story_genres!inner(stories!inner(status))')
+      .eq('story_genres.stories.status', 'published')
+      .order('name'),
     supabase
       .from('profiles')
       .select('id, username, display_name, avatar_url, bio, role, followers_count')
