@@ -153,6 +153,11 @@ export function ProfileClient() {
       setProfile((prev: any) => ({ ...prev, ...upsertData }));
       setEditing(false);
       toast.success('Profile updated successfully');
+      
+      // Notify the navigation bar to fetch the updated profile base64 avatar image instantly
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile-updated'));
+      }
     } catch (err: any) {
       toast.error('Failed to update profile');
     }

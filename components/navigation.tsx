@@ -53,23 +53,38 @@ export function Navigation() {
   }, []);
 
   useEffect(() => {
+    let currentUserId: string | null = null;
     (async () => {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
       if (data.user) {
+        currentUserId = data.user.id;
         fetchProfile(data.user.id);
       }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
+        currentUserId = session.user.id;
         fetchProfile(session.user.id);
       } else {
+        currentUserId = null;
         setAvatarUrl(null);
         setDisplayName('');
       }
     });
-    return () => sub.subscription.unsubscribe();
+
+    const handleProfileUpdate = () => {
+      if (currentUserId) {
+        fetchProfile(currentUserId);
+      }
+    };
+    window.addEventListener('profile-updated', handleProfileUpdate);
+
+    return () => {
+      sub.subscription.unsubscribe();
+      window.removeEventListener('profile-updated', handleProfileUpdate);
+    };
   }, []);
 
   return (
