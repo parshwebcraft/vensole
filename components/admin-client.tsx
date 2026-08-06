@@ -948,7 +948,14 @@ CREATE POLICY "Allow public select" ON analytics_logs FOR SELECT TO anon, authen
                                     <td className="py-3 font-mono font-medium text-midnight/80">{l.ip_address}</td>
                                     <td className="py-3 text-midnight/70">
                                       {l.city && l.city !== 'local' && l.city !== 'unknown' ? (
-                                        <span>{l.city}, {l.country}</span>
+                                        <div className="flex flex-col">
+                                          <span>{l.city.replace(/%20/g, ' ')}, {l.country}</span>
+                                          {l.latitude && l.longitude && l.latitude !== '0' && l.longitude !== '0' && (
+                                            <span className="text-[9px] text-midnight/40 font-mono mt-0.5 leading-none">
+                                              ({Number(l.latitude).toFixed(4)}, {Number(l.longitude).toFixed(4)})
+                                            </span>
+                                          )}
+                                        </div>
                                       ) : l.ip_address === '127.0.0.1' || l.ip_address === '::1' ? (
                                         <span className="text-gold font-medium">Localhost</span>
                                       ) : (

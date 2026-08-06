@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const latitude = request.headers.get('x-vercel-ip-latitude') || '0';
     const longitude = request.headers.get('x-vercel-ip-longitude') || '0';
 
-    // Fallback Geolocation API for local development when testing real IPs
+    // Fallback Geolocation API for local development or when Vercel geo is missing/incomplete
     let finalCountry = country;
     let finalRegion = region;
     let finalCity = city;
@@ -24,21 +24,52 @@ export async function POST(request: Request) {
     let finalLon = longitude;
 
     const firstIp = ip.split(',')[0].trim();
-    if (firstIp !== '127.0.0.1' && firstIp !== '::1' && firstIp !== 'localhost' && (country === 'local' || country === 'unknown')) {
+    
+    // Check if geo headers from Vercel are missing, generic 'local'/'unknown', or if coordinates are 0
+    const isLocalOrMissingGeo = 
+      country === 'local' || 
+      country === 'unknown' || 
+      city === 'local' || 
+      city === 'unknown' || 
+      latitude === '0' || 
+      longitude === '0' || 
+      !latitude || 
+      !longitude;
+
+    if (firstIp !== '127.0.0.1' && firstIp !== '::1' && firstIp !== 'localhost' && isLocalOrMissingGeo) {
       try {
-        const geoRes = await fetch(`https://ipapi.co/${firstIp}/json/`);
+        // Try FreeIPAPI first (fast, HTTPS, free, high rate-limit)
+        const geoRes = await fetch(`https://freeipapi.com/api/json/${firstIp}`);
         if (geoRes.ok) {
           const geoData = await geoRes.json();
-          if (geoData && !geoData.error) {
-            finalCountry = geoData.country_name || country;
-            finalRegion = geoData.region || region;
-            finalCity = geoData.city || city;
-            finalLat = String(geoData.latitude || latitude);
-            finalLon = String(geoData.longitude || longitude);
+          if (geoData && geoData.cityName) {
+            finalCountry = geoData.countryName || country;
+            finalRegion = geoData.regionName || region;
+            finalCity = geoData.cityName || city;
+            finalLat = String(geoData.latitude !== undefined ? geoData.latitude : latitude);
+            finalLon = String(geoData.longitude !== undefined ? geoData.longitude : longitude);
+            console.log(`Geocoded ${firstIp} via freeipapi: ${finalCity}, ${finalCountry} (${finalLat}, ${finalLon})`);
           }
         }
       } catch (e) {
-        console.error('Geo API error:', e);
+        console.error('FreeIPAPI error, trying ipapi.co fallback:', e);
+        // Fallback to ipapi.co
+        try {
+          const geoRes = await fetch(`https://ipapi.co/${firstIp}/json/`);
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            if (geoData && !geoData.error) {
+              finalCountry = geoData.country_name || country;
+              finalRegion = geoData.region || region;
+              finalCity = geoData.city || city;
+              finalLat = String(geoData.latitude || latitude);
+              finalLon = String(geoData.longitude || longitude);
+              console.log(`Geocoded ${firstIp} via ipapi.co fallback: ${finalCity}, ${finalCountry}`);
+            }
+          }
+        } catch (err) {
+          console.error('ipapi.co fallback error:', err);
+        }
       }
     }
 
